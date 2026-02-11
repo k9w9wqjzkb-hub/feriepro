@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>iWork - Calendario Full View</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --sabato: #E5E5EA;
+            --domenica: #8E8E93;
+            --festivo: #FF3B30;
+            --ferie-az: #004085;
+            --ferie: #34C759;
+            --rol: #FF9500;
+            --avis: #FFD60A;
+            --malattia: #AF52DE;
+        }
+
+        .main-content { padding: 5px !important; }
+
+        /* Griglia ultra-compatta per stare in verticale */
+        .calendar-wrapper {
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .grid-table {
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: fixed; /* Forza la larghezza fissa delle colonne */
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .grid-table th, .grid-table td {
+            border: 0.1px solid #ddd;
+            text-align: center;
+            padding: 0;
+            height: 22px; /* Altezza ridotta per far stare tutto il 2026 */
+            font-size: 8px; /* Testo molto piccolo per iPhone */
+        }
+
+        .col-mese { 
+            width: 45px; /* Mese abbreviato per risparmiare spazio */
+            font-weight: 700;
+            background: #f2f2f7;
+            text-align: left !important;
+            padding-left: 2px !important;
+            font-size: 9px !important;
+        }
+
+        /* Classi Colore conformi all'allegato */
+        .bg-sabato { background-color: var(--sabato); }
+        .bg-domenica { background-color: var(--domenica); color: white; }
+        .bg-festivo { background-color: var(--festivo); color: white; }
+        .bg-ferie-coll { background-color: var(--ferie-az); color: white; } /* Blu scuro */
+        .bg-ferie-ind { background-color: var(--ferie); color: white; } /* Verde */
+        .bg-malattia { background-color: var(--malattia); color: white; } /* Viola */
+        .text-rol { color: var(--rol); font-weight: bold; font-size: 7px; }
+        .bg-avis { background-color: var(--avis); color: black; }
+
+        .legenda-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            padding: 10px;
+            font-size: 9px;
+            margin-top: 10px;
+        }
+        .legenda-item { display: flex; align-items: center; gap: 4px; }
+        .box { width: 10px; height: 10px; border-radius: 1px; border: 0.1px solid #999; }
+    </style>
+</head>
+<body data-page="calendario">
+    <header class="ios-navbar">
+        <div class="nav-content"><span class="nav-brand">Calendario 2026</span></div>
+    </header>
+
+    <main class="main-content">
+        <div class="calendar-wrapper">
+            <table class="grid-table">
+                <thead>
+                    <tr id="calendarHeader">
+                        <th class="col-mese">2026</th>
+                        </tr>
+                </thead>
+                <tbody id="calendarBody">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="legenda-grid ios-card">
+            <div class="legenda-item"><div class="box" style="background:var(--festivo)"></div> Festivo</div>
+            <div class="legenda-item"><div class="box" style="background:var(--sabato)"></div> Sab</div>
+            <div class="legenda-item"><div class="box" style="background:var(--domenica)"></div> Dom</div>
+            <div class="legenda-item"><div class="box" style="background:var(--ferie)"></div> Ferie</div>
+            <div class="legenda-item"><div class="box" style="background:var(--ferie-az)"></div> F. Az.</div>
+            <div class="legenda-item"><div class="box" style="background:var(--malattia)"></div> Mal.</div>
+            <div class="legenda-item"><div class="box" style="background:var(--avis)"></div> Avis</div>
+            <div class="legenda-item"><div class="box" style="border-color:var(--rol)"></div> ROL</div>
+        </div>
+    </main>
+
+    <nav class="tab-bar">
+        <a href="index.html" class="tab-item">🏠<span>Home</span></a>
+        <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
+        <a href="calendario.html" class="tab-item active">🗓️<span>Cal</span></a>
+        <a href="malattia.html" class="tab-item">🤒<span>Mal</span></a>
+    </nav>
+
+    <script src="app.js"></script>
+</body>
+</html>
