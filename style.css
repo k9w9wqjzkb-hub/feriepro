@@ -26,7 +26,6 @@ body {
     color: var(--text-main);
     line-height: 1.4;
     user-select: none;
-    /* Impedisce lo scroll elastico che nasconde la navbar */
     overflow-x: hidden;
 }
 
@@ -35,20 +34,18 @@ body {
     position: fixed;
     top: 0;
     width: 100%;
-    /* Altezza aumentata per gestire la notch correttamente */
     height: calc(44px + env(safe-area-inset-top));
     background: var(--nav-bg);
     backdrop-filter: blur(20px);
     border-bottom: 0.5px solid var(--border);
     z-index: 1000;
     display: flex;
-    align-items: flex-end; /* Allinea il testo in basso alla navbar */
+    align-items: flex-end; 
     justify-content: center;
     padding-bottom: 10px;
 }
 
 .main-content {
-    /* Padding superiore calcolato per non finire sotto la navbar */
     padding: calc(60px + env(safe-area-inset-top)) 0 calc(100px + env(safe-area-inset-bottom)) 0;
 }
 
@@ -56,7 +53,7 @@ body {
 .large-title { font-size: 34px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
 .date-subtitle { font-size: 13px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
 
-/* --- CARDS AGGIORNATE --- */
+/* --- CARDS --- */
 .ios-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px 20px; }
 
 .ios-card {
@@ -66,58 +63,64 @@ body {
     display: flex;
     flex-direction: column;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    position: relative;
-    overflow: hidden;
 }
 
 .card-label { font-size: 12px; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; }
 .value { font-size: 28px; font-weight: 700; letter-spacing: -1px; margin: 4px 0; }
 
-/* Stile per i dettagli piccoli (consuntivo/pianificato) nelle card */
-.card-detail {
-    font-size: 11px;
-    color: var(--text-sec);
+/* --- MODALI (SHEETS) AGGIORNATE --- */
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    z-index: 2000;
+}
+
+.ios-page-sheet {
+    position: fixed;
+    bottom: -100%;
+    left: 0;
+    width: 100%;
+    background: var(--system-gray);
+    border-radius: 12px 12px 0 0;
+    transition: bottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 2001;
+    
+    /* Impedisce alla maschera di finire sopra la notch */
+    max-height: calc(100% - 60px - env(safe-area-inset-top));
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
+}
+
+.ios-page-sheet.active { 
+    bottom: 0; 
+}
+
+/* Header della modale sempre visibile */
+.modal-nav {
     display: flex;
     justify-content: space-between;
-    margin-top: 2px;
+    align-items: center;
+    padding: 12px 16px;
+    background: white;
+    border-bottom: 0.5px solid var(--border);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    flex-shrink: 0;
 }
 
-/* --- TABELLA CALENDARIO --- */
-.calendar-wrapper {
-    overflow-x: auto;
-    background: white;
-    margin: 0 16px;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+/* Corpo della modale scorrevole se i dati sono tanti */
+.modal-scroll-area {
+    overflow-y: auto;
+    padding: 20px 0;
+    flex-grow: 1;
     -webkit-overflow-scrolling: touch;
 }
-
-.calendar-table { border-collapse: collapse; width: 100%; font-size: 12px; text-align: center; }
-.calendar-table th, .calendar-table td {
-    border: 0.5px solid #F2F2F7;
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
-}
-
-.col-mese {
-    position: sticky;
-    left: 0;
-    background: #F9F9F9 !important;
-    z-index: 10;
-    font-weight: 800;
-    color: var(--text-main);
-    border-right: 1px solid var(--border) !important;
-}
-
-/* --- COLORI STATI --- */
-.bg-sabato, .bg-domenica { background-color: #F8F8F8; }
-.bg-festivo { background-color: #FFE5E5; color: var(--red); font-weight: bold; }
-.bg-ferie-ind { background-color: var(--blue); color: white; }
-.bg-ferie-coll { background-color: var(--indigo); color: white; }
-.bg-malattia { background-color: var(--purple); color: white; }
-.bg-avis { background-color: var(--avis); color: white; }
-.text-rol { color: var(--orange); font-weight: 700; }
 
 /* --- LISTE E INPUT --- */
 .ios-input-group { 
@@ -133,24 +136,24 @@ body {
     align-items: center;
     padding: 12px 16px;
     border-bottom: 0.5px solid var(--border);
-    min-height: 44px;
+    min-height: 48px;
     background: white;
 }
 
-.ios-input-row label { font-size: 16px; color: var(--text-main); }
+.ios-input-row label { font-size: 17px; color: var(--text-main); width: 100px; }
 
-/* Input più grandi per iPhone */
 .ios-input-row input, .ios-input-row select {
-    font-size: 16px;
+    font-size: 17px; /* Dimensione corretta per evitare zoom su iOS */
     border: none;
     outline: none;
     background: transparent;
     flex: 1;
     text-align: right;
     color: var(--text-sec);
+    appearance: none; /* Rimuove stile default su select */
 }
 
-/* --- TAB BAR (BOTTOM NAV) --- */
+/* --- TAB BAR --- */
 .tab-bar {
     position: fixed;
     bottom: 0;
@@ -172,55 +175,15 @@ body {
     justify-content: center;
     text-decoration: none;
     color: var(--text-sec);
-    padding-top: 6px;
 }
 
-.tab-item span { font-size: 10px; margin-top: 2px; font-weight: 500; }
 .tab-item.active { color: var(--blue); }
-
-/* --- MODALI (SHEETS) --- */
-.ios-page-sheet {
-    position: fixed;
-    bottom: -100%;
-    left: 0;
-    width: 100%;
-    background: var(--system-gray);
-    border-radius: 12px 12px 0 0;
-    transition: bottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    z-index: 2001;
-    max-height: 90vh;
-    padding-bottom: env(safe-area-inset-bottom);
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
-}
-
-.ios-page-sheet.active { bottom: 0; }
 
 .btn-link {
     background: none;
     border: none;
     color: var(--blue);
     font-size: 17px;
-    padding: 8px 16px;
-    font-weight: 400;
-}
-
-.btn-link:active { opacity: 0.5; }
-
-/* Tasto Floating + */
-.floating-btn {
-    position: fixed;
-    right: 20px;
-    bottom: calc(100px + env(safe-area-inset-bottom));
-    width: 56px;
-    height: 56px;
-    border-radius: 28px;
-    background: var(--blue);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    box-shadow: 0 4px 12px rgba(0,122,255,0.3);
-    border: none;
-    z-index: 999;
+    padding: 8px;
+    cursor: pointer;
 }
