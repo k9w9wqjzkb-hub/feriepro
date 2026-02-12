@@ -1,48 +1,25 @@
-/* --- STILI CALENDARIO --- */
-.calendar-wrapper {
-    overflow-x: auto; /* Permette lo scorrimento laterale */
-    background: white;
-    margin: 10px 16px;
-    border-radius: 12px;
-    border: 0.5px solid #DDD;
-    -webkit-overflow-scrolling: touch;
-}
+<body data-page="calendario">
+    <header class="ios-navbar">
+        <div class="nav-content"><span class="nav-brand">Calendario 2026</span></div>
+    </header>
+    <main class="main-content">
+        <header class="dashboard-header">
+            <p class="date-subtitle">Pianificazione</p>
+            <h1 class="large-title">Presenze</h1>
+        </header>
 
-.calendar-table {
-    border-collapse: collapse;
-    width: 100%;
-    font-size: 11px; /* Testo piccolo per far stare più dati */
-    text-align: center;
-}
-
-.calendar-table th, .calendar-table td {
-    border: 0.5px solid #F2F2F7;
-    min-width: 30px; /* Larghezza fissa per i giorni */
-    height: 35px;
-}
-
-/* Colonna dei Mesi Fissa */
-.col-mese {
-    position: sticky;
-    left: 0;
-    background: #F2F2F7;
-    font-weight: bold;
-    z-index: 10;
-    min-width: 50px !important;
-}
-
-/* Colori celle (da abbinare alle classi in app.js) */
-.bg-sabato { background-color: #F9F9F9; }
-.bg-domenica { background-color: #E5E5EA; }
-.bg-festivo { background-color: #FFDADA; color: #FF3B30; font-weight: bold; }
-.bg-ferie-ind { background-color: #007AFF; color: white; font-weight: bold; }
-.bg-ferie-coll { background-color: #5856D6; color: white; font-weight: bold; }
-.bg-malattia { background-color: #FF3B30; color: white; font-weight: bold; }
-
-.legenda-mini {
-    padding: 0 16px 10px;
-    font-size: 10px;
-    display: flex;
-    gap: 15px;
-    color: #8E8E93;
-}
+        <div class="calendar-wrapper">
+            <table class="calendar-table">
+                <thead id="calendarHeader"></thead>
+                <tbody id="calendarBody"></tbody>
+            </table>
+        </div>
+    </main>
+    <nav class="tab-bar">
+        <a href="index.html" class="tab-item">🏠<span>Home</span></a>
+        <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
+        <a href="malattia.html" class="tab-item">🤒<span>Mal</span></a>
+        <a href="calendario.html" class="tab-item active">🗓️<span>Cal</span></a>
+    </nav>
+    <script src="app.js"></script>
+</body>

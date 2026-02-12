@@ -1,53 +1,28 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iWork - Malattia</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-</head>
-<body data-page="malattia"> <header class="ios-navbar">
-        <div class="nav-content"><span class="nav-brand">iWork</span></div>
+<body data-page="malattia">
+    <header class="ios-navbar">
+        <div class="nav-content"><span class="nav-brand">Salute</span></div>
     </header>
-
     <main class="main-content">
         <header class="dashboard-header">
-            <p class="date-subtitle">Riepilogo Salute</p>
+            <p class="date-subtitle">Riepilogo Eventi</p>
             <h1 class="large-title">Malattia</h1>
         </header>
-
+        
         <section style="padding: 0 16px 20px;">
-            <div class="ios-card" style="border-left: 4px solid var(--purple); flex-direction: row; justify-content: space-between; align-items: center;">
-                <div>
-                    <span class="card-label" style="color:var(--purple)">Totale Giorni/Ore 2026</span>
-                    <div class="value" id="total-malattia">0</div>
-                </div>
-                <div style="font-size: 32px;">🤒</div>
+            <div class="ios-card" style="border-left: 4px solid var(--purple);">
+                <span class="card-label" style="color:var(--purple)">Giorni Totali 2026</span>
+                <div class="value" id="total-malattia">0,00</div>
             </div>
         </section>
 
-        <div class="section-title" style="padding: 0 20px 10px; color: #8E8E93; font-size: 13px; font-weight: 600; text-transform: uppercase;">
-            Cronologia Eventi
-        </div>
-        
         <div id="lista-malattia" class="ios-input-group">
-            <div style="padding: 20px; text-align: center; color: #8E8E93;">
-                Nessun evento registrato
             </div>
-        </div>
     </main>
-
     <nav class="tab-bar">
         <a href="index.html" class="tab-item">🏠<span>Home</span></a>
         <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
-        <a href="malattia.html" class="tab-item active">🤒<span>Mal</span></a>     
+        <a href="malattia.html" class="tab-item active">🤒<span>Mal</span></a>
         <a href="calendario.html" class="tab-item">🗓️<span>Cal</span></a>
     </nav>
-
     <script src="app.js"></script>
 </body>
-</html>

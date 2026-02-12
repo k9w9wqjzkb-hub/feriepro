@@ -1,165 +1,185 @@
+/* --- RESET E VARIABILI IOS --- */
 :root {
-    /* Tavolozza Colori iOS Ufficiale */
+    --system-gray: #F2F2F7;
     --blue: #007AFF;
     --red: #FF3B30;
-    --green: #34C759;
     --orange: #FF9500;
-    --indigo: #5856D6;
     --purple: #AF52DE;
-    --bg: #F2F2F7;
-    --card-bg: #FFFFFF;
-    
-    /* Colori Specifici Calendario */
-    --sabato: #E5E5EA;
-    --domenica: #C7C7CC;
-    --ferie-az: #004085;
-    --avis: #FFD60A;
-    --border-light: rgba(0, 0, 0, 0.1);
+    --indigo: #5856D6;
+    --avis: #E63946;
+    --text-main: #000000;
+    --text-sec: #8E8E93;
+    --border: #C6C6C8;
 }
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: var(--bg);
     margin: 0;
-    /* Padding per la tab-bar + safe area iPhone */
-    padding-bottom: calc(100px + env(safe-area-inset-bottom));
-    color: #000;
-    -webkit-tap-highlight-color: transparent;
+    padding: 0;
+    background-color: var(--system-gray);
+    color: var(--text-main);
     line-height: 1.4;
-    overflow-x: hidden;
+    user-select: none;
 }
 
-/* --- NAVBAR (Effetto Blur Vetro) --- */
+/* --- LAYOUT --- */
 .ios-navbar {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    padding: calc(45px + env(safe-area-inset-top)) 16px 12px;
-    border-bottom: 0.5px solid var(--border-light);
-    position: sticky; 
-    top: 0; 
-    z-index: 1000;
-    display: flex; 
-    align-items: center; 
-    justify-content: center;
-}
-.nav-brand { font-weight: 600; font-size: 17px; letter-spacing: -0.4px; }
-
-/* --- DASHBOARD E TITOLI --- */
-.dashboard-header { padding: 20px 20px 10px; }
-.large-title { font-size: 34px; font-weight: 700; letter-spacing: -1px; margin: 0; }
-.date-subtitle { color: #8E8E93; text-transform: uppercase; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-
-/* --- CARD E GRID --- */
-.ios-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; }
-.ios-card { 
-    background: var(--card-bg); 
-    border-radius: 14px; 
-    padding: 16px; 
-    display: flex; 
-    flex-direction: column; 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    border: 0.5px solid var(--border-light);
-}
-.card-label { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-.value { font-size: 24px; font-weight: 700; color: #1C1C1E; }
-
-/* --- PULSANTI STILE iOS --- */
-.ios-card-btn {
+    position: fixed;
+    top: 0;
     width: 100%;
+    height: 44px;
+    background: rgba(249, 249, 249, 0.94);
+    backdrop-filter: blur(20px);
+    border-bottom: 0.5px solid var(--border);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: env(safe-area-inset-top);
+}
+
+.nav-brand { font-weight: 600; font-size: 17px; }
+
+.main-content {
+    padding: calc(60px + env(safe-area-inset-top)) 0 100px 0;
+}
+
+.dashboard-header { padding: 0 16px 20px; }
+.large-title { font-size: 34px; font-weight: 700; margin: 0; }
+.date-subtitle { font-size: 13px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 4px; }
+
+/* --- CARDS --- */
+.ios-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px 20px; }
+
+.ios-card {
     background: white;
-    border: 0.5px solid var(--border-light);
     border-radius: 12px;
     padding: 16px;
     display: flex;
+    flex-direction: column;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.card-label { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.value { font-size: 28px; font-weight: 700; letter-spacing: -1px; }
+
+/* --- TABELLA CALENDARIO --- */
+.calendar-wrapper {
+    overflow-x: auto;
+    background: white;
+    margin: 0 16px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    -webkit-overflow-scrolling: touch;
+}
+
+.calendar-table { border-collapse: collapse; width: 100%; font-size: 12px; text-align: center; }
+.calendar-table th, .calendar-table td {
+    border: 0.5px solid #E5E5EA;
+    width: 35px;
+    height: 35px;
+    min-width: 35px;
+}
+
+.col-mese {
+    position: sticky;
+    left: 0;
+    background: #F9F9F9 !important;
+    z-index: 10;
+    font-weight: 700;
+    color: var(--text-sec);
+}
+
+/* --- COLORI STATI --- */
+.bg-sabato, .bg-domenica { background-color: #F2F2F7; }
+.bg-festivo { background-color: #FFD6D6; color: var(--red); }
+.bg-ferie-ind { background-color: var(--blue); color: white; }
+.bg-ferie-coll { background-color: var(--indigo); color: white; }
+.bg-malattia { background-color: var(--purple); color: white; }
+.bg-avis { background-color: var(--avis); color: white; }
+.text-rol { color: var(--orange); font-weight: 700; }
+
+/* --- LISTE E INPUT --- */
+.ios-input-group { background: white; margin: 0 16px 20px; border-radius: 10px; overflow: hidden; }
+
+.ios-input-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 0.5px solid var(--border);
+    min-height: 44px;
+}
+
+.ios-input-row:last-child { border-bottom: none; }
+
+/* --- TAB BAR --- */
+.tab-bar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 83px;
+    background: rgba(249, 249, 249, 0.94);
+    backdrop-filter: blur(20px);
+    border-top: 0.5px solid var(--border);
+    display: flex;
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 1000;
+}
+
+.tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--text-sec);
+    font-size: 10px;
+}
+
+.tab-item.active { color: var(--blue); }
+.tab-item span { margin-top: 4px; }
+
+/* --- MODALI --- */
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    z-index: 2000;
+}
+
+.ios-page-sheet {
+    position: fixed;
+    bottom: -100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    border-radius: 12px 12px 0 0;
+    transition: bottom 0.3s ease-out;
+    z-index: 2001;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.ios-page-sheet.active { bottom: 0; }
+
+.modal-nav {
+    display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 12px 16px;
+    border-bottom: 0.5px solid var(--border);
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--blue);
     font-size: 17px;
-    margin-bottom: 10px;
     cursor: pointer;
-}
-.ios-btn-blue { background: var(--blue); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; }
-.ios-btn-white { background: white; border: 0.5px solid var(--border-light); border-radius: 10px; padding: 12px; font-weight: 500; cursor: pointer; }
-
-/* --- CALENDARIO (Ottimizzato per Scroll) --- */
-.calendar-wrapper {
-    margin: 10px 16px;
-    background: white;
-    border: 0.5px solid #DDD;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 12px;
-}
-.calendar-table { border-collapse: collapse; width: 100%; font-size: 11px; text-align: center; }
-.calendar-table th, .calendar-table td {
-    border: 0.5px solid #F2F2F7;
-    min-width: 32px;
-    height: 38px;
-}
-.col-mese { 
-    position: sticky; left: 0; 
-    background: #F2F2F7 !important; 
-    font-weight: 700; 
-    min-width: 55px !important;
-    z-index: 2;
-}
-
-/* Colori celle calendario */
-.bg-sabato { background-color: var(--sabato) !important; }
-.bg-domenica { background-color: var(--domenica) !important; }
-.bg-festivo { background-color: #FFDADA !important; color: var(--red) !important; font-weight: bold; }
-.bg-ferie-ind { background-color: var(--blue) !important; color: white !important; }
-.bg-ferie-coll { background-color: var(--indigo) !important; color: white !important; }
-.bg-malattia { background-color: var(--red) !important; color: white !important; }
-
-/* --- INPUTS --- */
-.ios-input-group { background: white; border-radius: 12px; margin-bottom: 20px; border: 0.5px solid #DDD; overflow: hidden; }
-.ios-input-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid #EEE; }
-.ios-input-row:last-child { border-bottom: none; }
-.ios-input-row input, .ios-input-row select {
-    border: none; background: none; font-size: 17px; color: #007AFF; text-align: right; outline: none; width: 50%; 
-}
-
-/* --- MODALI (iOS Sheet) --- */
-.ios-page-sheet { 
-    position: fixed; 
-    bottom: -100%; 
-    left: 0; 
-    width: 100%; 
-    background: #F2F2F7; 
-    border-radius: 15px 15px 0 0; 
-    transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1); 
-    z-index: 3000; 
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
-}
-.ios-page-sheet.active { transform: translateY(-100%); bottom: 0; }
-.modal-backdrop { 
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(0,0,0,0.4); display: none; z-index: 2500; 
-}
-.modal-nav {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 16px; background: white; border-bottom: 0.5px solid #DDD; border-radius: 15px 15px 0 0;
-}
-.btn-link { background: none; border: none; color: var(--blue); font-size: 17px; cursor: pointer; }
-
-/* --- TAB BAR (iPhone Safe Area) --- */
-.tab-bar { 
-    position: fixed; bottom: 0; width: 100%; 
-    height: calc(65px + env(safe-area-inset-bottom)); 
-    background: rgba(255,255,255,0.94); 
-    backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); 
-    display: flex; border-top: 0.5px solid rgba(0,0,0,0.1); 
-    z-index: 2000; padding-bottom: env(safe-area-inset-bottom);
-}
-.tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #8E8E93; font-size: 20px; }
-.tab-item.active { color: var(--blue); }
-.tab-item span { font-size: 10px; margin-top: 4px; font-weight: 500; }
-
-/* --- FAB --- */
-.ios-fab { 
-    position: fixed; bottom: calc(85px + env(safe-area-inset-bottom)); 
-    right: 20px; width: 56px; height: 56px; 
-    background: var(--blue); color: white; border-radius: 28px; 
-    border: none; font-size: 32px; box-shadow: 0 4px 12px rgba(0,122,255,0.3); z-index: 100;
 }
