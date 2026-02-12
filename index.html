@@ -3,21 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>FERIE</title>
+    <title>iWork - Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    
     <link rel="apple-touch-icon" href="icon-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="iWork">
 </head>
 <body data-page="index">
     <header class="ios-navbar">
-        <div class="nav-content"><span class="nav-brand">FERIE</span></div>
+        <div class="nav-content"><span class="nav-brand">iWork</span></div>
     </header>
 
     <main class="main-content">
         <header class="dashboard-header">
-            <p class="date-subtitle" id="current-date"></p>
+            <p class="date-subtitle" id="current-date">Caricamento...</p>
             <h1 class="large-title">Dashboard</h1>
         </header>
 
@@ -68,6 +70,7 @@
                         <option value="conto">Perm.B.Ore</option>
                         <option value="malattia">Malattia</option>
                         <option value="avis">🩸 AVIS</option>
+                        <option value="maturazione">➕ Maturazione</option>
                     </select>
                 </div>
                 <div class="ios-input-row">
@@ -82,9 +85,9 @@
                     <label>Note</label>
                     <input type="text" id="in-note" placeholder="Opzionale">
                 </div>
-                <div class="ios-input-row" style="justify-content:space-between; display:flex; align-items:center;">
+                <div class="ios-input-row">
                     <label>Solo Pianificato</label>
-                    <input type="checkbox" id="in-pianificato" style="width:20px; height:20px;">
+                    <input type="checkbox" id="in-pianificato" style="width:22px; height:22px;">
                 </div>
             </div>
         </div>
@@ -98,31 +101,34 @@
             <button onclick="toggleSheet(false)" class="btn-link" style="font-weight:700;">Fatto</button>
         </div>
         <div style="padding:20px; overflow-y:auto; height:calc(100% - 60px);">
-            <div id="settings-panel" style="display:none; background:#F2F2F7; padding:15px; border-radius:14px; margin-bottom:20px; border: 1px solid #DDD;">
+            <div id="settings-panel" style="display:none; background:#F2F2F7; padding:15px; border-radius:14px; margin-bottom:20px; border: 0.5px solid #CCC;">
                 <h3 style="margin-top:0; font-size:16px;">Configurazione Residui (Ore)</h3>
                 <div id="settings-inputs"></div>
-                <button onclick="saveSettings()" class="ios-btn-blue" style="margin-top:10px; padding:12px;">Salva e Aggiorna</button>
+                <button onclick="saveSettings()" class="ios-btn-blue" style="margin-top:10px; width:100%;">Salva e Aggiorna</button>
             </div>
-            <div class="consuntivo-container">
-                <table style="width:100%; border-collapse:collapse; font-size:12px;">
+
+            <div class="consuntivo-container" style="background:white; border-radius:12px; overflow:hidden; border:0.5px solid #DDD;">
+                <table style="width:100%; border-collapse:collapse; font-size:13px;">
                     <thead>
                         <tr style="background:#F9F9F9; border-bottom:0.5px solid #DDD;">
-                            <th style="padding:10px; text-align:left;">VOCE</th>
-                            <th style="padding:10px; text-align:center;">AP</th>
-                            <th style="padding:10px; text-align:center;">SPET.</th>
-                            <th style="padding:10px; text-align:center;">GOD.</th>
-                            <th style="padding:10px; text-align:right;">SALDO</th>
+                            <th style="padding:12px; text-align:left;">VOCE</th>
+                            <th style="padding:12px; text-align:center;">AP</th>
+                            <th style="padding:12px; text-align:center;">SPET.</th>
+                            <th style="padding:12px; text-align:center;">GOD.</th>
+                            <th style="padding:12px; text-align:right;">SALDO</th>
                         </tr>
                     </thead>
-                    <tbody id="consuntivo-body"></tbody>
+                    <tbody id="consuntivo-body">
+                        </tbody>
                 </table>
             </div>
+
             <div style="margin-top:30px;">
-                <button onclick="exportBackup()" class="ios-btn-white" style="color:var(--blue); display:flex; justify-content:space-between;">
+                <button onclick="exportBackup()" class="ios-btn-white" style="color:var(--blue); display:flex; justify-content:space-between; width:100%; margin-bottom:10px;">
                     <span>Esporta Backup</span><span>📥</span>
                 </button>
                 <input type="file" id="importFile" style="display:none" onchange="importBackup(event)">
-                <button onclick="document.getElementById('importFile').click()" class="ios-btn-white" style="color:var(--orange); margin-top:10px; display:flex; justify-content:space-between;">
+                <button onclick="document.getElementById('importFile').click()" class="ios-btn-white" style="color:var(--orange); display:flex; justify-content:space-between; width:100%;">
                     <span>Importa Backup</span><span>📤</span>
                 </button>
             </div>
@@ -132,9 +138,26 @@
     <nav class="tab-bar">
         <a href="index.html" class="tab-item active">🏠<span>Home</span></a>
         <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
-        <a href="malattia.html" class="tab-item">🤒<span>Malattia</span></a>
-        <a href="calendario.html" class="tab-item">🍟<span>Calendario</span></a>
+        <a href="malattia.html" class="tab-item">🤒<span>Mal</span></a>     
+        <a href="calendario.html" class="tab-item">🗓️<span>Cal</span></a>
     </nav>
+
     <script src="app.js"></script>
+    <script>
+        // Funzione per gestire l'apertura della "Sheet" del consuntivo
+        function toggleSheet(show) {
+            const sheet = document.getElementById('ios-sheet');
+            const overlay = document.getElementById('overlay-sheet');
+            if(show) {
+                sheet.classList.add('active');
+                overlay.style.display = 'block';
+                // Quando apriamo il consuntivo, aggiorniamo la tabella
+                if(typeof aggiornaConsuntivoTable === 'function') aggiornaConsuntivoTable();
+            } else {
+                sheet.classList.remove('active');
+                overlay.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
