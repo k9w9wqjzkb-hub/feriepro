@@ -10,47 +10,53 @@
     --text-main: #000000;
     --text-sec: #8E8E93;
     --border: #C6C6C8;
+    --nav-bg: rgba(249, 249, 249, 0.94);
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent; 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: var(--system-gray);
     color: var(--text-main);
     line-height: 1.4;
     user-select: none;
+    /* Impedisce lo scroll elastico che nasconde la navbar */
+    overflow-x: hidden;
 }
 
-/* --- LAYOUT --- */
+/* --- LAYOUT & SAFE AREAS --- */
 .ios-navbar {
     position: fixed;
     top: 0;
     width: 100%;
-    height: 44px;
-    background: rgba(249, 249, 249, 0.94);
+    /* Altezza aumentata per gestire la notch correttamente */
+    height: calc(44px + env(safe-area-inset-top));
+    background: var(--nav-bg);
     backdrop-filter: blur(20px);
     border-bottom: 0.5px solid var(--border);
     z-index: 1000;
     display: flex;
-    align-items: center;
+    align-items: flex-end; /* Allinea il testo in basso alla navbar */
     justify-content: center;
-    padding-top: env(safe-area-inset-top);
+    padding-bottom: 10px;
 }
-
-.nav-brand { font-weight: 600; font-size: 17px; }
 
 .main-content {
-    padding: calc(60px + env(safe-area-inset-top)) 0 100px 0;
+    /* Padding superiore calcolato per non finire sotto la navbar */
+    padding: calc(60px + env(safe-area-inset-top)) 0 calc(100px + env(safe-area-inset-bottom)) 0;
 }
 
-.dashboard-header { padding: 0 16px 20px; }
-.large-title { font-size: 34px; font-weight: 700; margin: 0; }
-.date-subtitle { font-size: 13px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 4px; }
+.dashboard-header { padding: 10px 16px 20px; }
+.large-title { font-size: 34px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+.date-subtitle { font-size: 13px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
 
-/* --- CARDS --- */
+/* --- CARDS AGGIORNATE --- */
 .ios-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px 20px; }
 
 .ios-card {
@@ -60,10 +66,21 @@ body {
     display: flex;
     flex-direction: column;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
 }
 
-.card-label { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
-.value { font-size: 28px; font-weight: 700; letter-spacing: -1px; }
+.card-label { font-size: 12px; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; }
+.value { font-size: 28px; font-weight: 700; letter-spacing: -1px; margin: 4px 0; }
+
+/* Stile per i dettagli piccoli (consuntivo/pianificato) nelle card */
+.card-detail {
+    font-size: 11px;
+    color: var(--text-sec);
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2px;
+}
 
 /* --- TABELLA CALENDARIO --- */
 .calendar-wrapper {
@@ -77,10 +94,10 @@ body {
 
 .calendar-table { border-collapse: collapse; width: 100%; font-size: 12px; text-align: center; }
 .calendar-table th, .calendar-table td {
-    border: 0.5px solid #E5E5EA;
-    width: 35px;
-    height: 35px;
-    min-width: 35px;
+    border: 0.5px solid #F2F2F7;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
 }
 
 .col-mese {
@@ -88,13 +105,14 @@ body {
     left: 0;
     background: #F9F9F9 !important;
     z-index: 10;
-    font-weight: 700;
-    color: var(--text-sec);
+    font-weight: 800;
+    color: var(--text-main);
+    border-right: 1px solid var(--border) !important;
 }
 
 /* --- COLORI STATI --- */
-.bg-sabato, .bg-domenica { background-color: #F2F2F7; }
-.bg-festivo { background-color: #FFD6D6; color: var(--red); }
+.bg-sabato, .bg-domenica { background-color: #F8F8F8; }
+.bg-festivo { background-color: #FFE5E5; color: var(--red); font-weight: bold; }
 .bg-ferie-ind { background-color: var(--blue); color: white; }
 .bg-ferie-coll { background-color: var(--indigo); color: white; }
 .bg-malattia { background-color: var(--purple); color: white; }
@@ -102,25 +120,43 @@ body {
 .text-rol { color: var(--orange); font-weight: 700; }
 
 /* --- LISTE E INPUT --- */
-.ios-input-group { background: white; margin: 0 16px 20px; border-radius: 10px; overflow: hidden; }
+.ios-input-group { 
+    background: white; 
+    margin: 0 16px 20px; 
+    border-radius: 10px; 
+    overflow: hidden;
+    border: 0.5px solid var(--border);
+}
 
 .ios-input-row {
     display: flex;
     align-items: center;
-    padding: 10px 16px;
+    padding: 12px 16px;
     border-bottom: 0.5px solid var(--border);
     min-height: 44px;
+    background: white;
 }
 
-.ios-input-row:last-child { border-bottom: none; }
+.ios-input-row label { font-size: 16px; color: var(--text-main); }
 
-/* --- TAB BAR --- */
+/* Input più grandi per iPhone */
+.ios-input-row input, .ios-input-row select {
+    font-size: 16px;
+    border: none;
+    outline: none;
+    background: transparent;
+    flex: 1;
+    text-align: right;
+    color: var(--text-sec);
+}
+
+/* --- TAB BAR (BOTTOM NAV) --- */
 .tab-bar {
     position: fixed;
     bottom: 0;
     width: 100%;
-    height: 83px;
-    background: rgba(249, 249, 249, 0.94);
+    height: calc(50px + env(safe-area-inset-bottom));
+    background: var(--nav-bg);
     backdrop-filter: blur(20px);
     border-top: 0.5px solid var(--border);
     display: flex;
@@ -136,50 +172,55 @@ body {
     justify-content: center;
     text-decoration: none;
     color: var(--text-sec);
-    font-size: 10px;
+    padding-top: 6px;
 }
 
+.tab-item span { font-size: 10px; margin-top: 2px; font-weight: 500; }
 .tab-item.active { color: var(--blue); }
-.tab-item span { margin-top: 4px; }
 
-/* --- MODALI --- */
-.modal-backdrop {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.4);
-    z-index: 2000;
-}
-
+/* --- MODALI (SHEETS) --- */
 .ios-page-sheet {
     position: fixed;
     bottom: -100%;
     left: 0;
     width: 100%;
-    background: white;
+    background: var(--system-gray);
     border-radius: 12px 12px 0 0;
-    transition: bottom 0.3s ease-out;
+    transition: bottom 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     z-index: 2001;
+    max-height: 90vh;
     padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
 }
 
 .ios-page-sheet.active { bottom: 0; }
-
-.modal-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    border-bottom: 0.5px solid var(--border);
-}
 
 .btn-link {
     background: none;
     border: none;
     color: var(--blue);
     font-size: 17px;
-    cursor: pointer;
+    padding: 8px 16px;
+    font-weight: 400;
+}
+
+.btn-link:active { opacity: 0.5; }
+
+/* Tasto Floating + */
+.floating-btn {
+    position: fixed;
+    right: 20px;
+    bottom: calc(100px + env(safe-area-inset-bottom));
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    background: var(--blue);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+    border: none;
+    z-index: 999;
 }
