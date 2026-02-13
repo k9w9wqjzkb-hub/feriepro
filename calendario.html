@@ -1,25 +1,65 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>iWork - Calendario</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
 <body data-page="calendario">
     <header class="ios-navbar">
-        <div class="nav-content"><span class="nav-brand">Calendario 2026</span></div>
+        <span class="nav-brand">Presenze 2026</span>
     </header>
+
     <main class="main-content">
         <header class="dashboard-header">
-            <p class="date-subtitle">Pianificazione</p>
-            <h1 class="large-title">Presenze</h1>
+            <p class="date-subtitle">Pianificazione Annuale</p>
+            <h1 class="large-title">Calendario</h1>
         </header>
 
         <div class="calendar-wrapper">
             <table class="calendar-table">
-                <thead id="calendarHeader"></thead>
-                <tbody id="calendarBody"></tbody>
+                <thead id="calendarHeader">
+                    </thead>
+                <tbody id="calendarBody">
+                    </tbody>
             </table>
         </div>
+
+        <div style="padding: 20px 16px; display: flex; flex-wrap: wrap; gap: 10px;">
+            <div style="display:flex; align-items:center; font-size:12px;">
+                <div style="width:12px; height:12px; background:var(--blue); border-radius:3px; margin-right:5px;"></div> Ferie
+            </div>
+            <div style="display:flex; align-items:center; font-size:12px;">
+                <div style="width:12px; height:12px; background:var(--purple); border-radius:3px; margin-right:5px;"></div> Malattia
+            </div>
+            <div style="display:flex; align-items:center; font-size:12px;">
+                <div style="width:12px; height:12px; background:var(--orange); border-radius:3px; margin-right:5px;"></div> ROL
+            </div>
+        </div>
     </main>
+
     <nav class="tab-bar">
-        <a href="index.html" class="tab-item">🏠<span>Home</span></a>
-        <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
-        <a href="malattia.html" class="tab-item">🤒<span>Mal</span></a>
-        <a href="calendario.html" class="tab-item active">🗓️<span>Cal</span></a>
+        <a href="index.html" class="tab-item">
+            <span class="tab-icon">🏠</span>
+            <span class="tab-label">Home</span>
+        </a>
+        <a href="ferie.html" class="tab-item">
+            <span class="tab-icon">📅</span>
+            <span class="tab-label">Ferie</span>
+        </a>
+        <a href="malattia.html" class="tab-item">
+            <span class="tab-icon">🛌</span>
+            <span class="tab-label">Salute</span>
+        </a>
+        <a href="calendario.html" class="tab-item active">
+            <span class="tab-icon">🗓️</span>
+            <span class="tab-label">Cal</span>
+        </a>
     </nav>
+
     <script src="app.js"></script>
 </body>
+</html>

@@ -1,7 +1,7 @@
 {
   "name": "iWork Ferie 2026",
-  "short_name": "Ferie",
-  "description": "Gestione Ferie, ROL e Malattia",
+  "short_name": "iWork",
+  "description": "Gestione Ferie, ROL e Malattia 2026",
   "start_url": "index.html",
   "display": "standalone",
   "orientation": "portrait",

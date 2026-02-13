@@ -1,30 +1,64 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>iWork - Ferie & ROL</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
 <body data-page="ferie">
     <header class="ios-navbar">
-        <div class="nav-content"><span class="nav-brand">Storico Assenze</span></div>
+        <span class="nav-brand">Storico Assenze</span>
     </header>
+
     <main class="main-content">
-        <header class="dashboard-header">
-            <p class="date-subtitle">Dettaglio Goduto</p>
-            <h1 class="large-title">Ferie & ROL</h1>
+        <header class="dashboard-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
+            <div>
+                <p class="date-subtitle">Dettaglio Goduto</p>
+                <h1 class="large-title">Ferie & ROL</h1>
+            </div>
+            <select id="filter-anno" onchange="renderizzaListaSpecifica('ferie')" style="border:none; color:var(--blue); font-weight:600; background:none; margin-bottom:10px;">
+                <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
+                <option value="2027">2027</option>
+            </select>
         </header>
-        
+
         <section style="padding: 0 16px 20px;">
             <div class="ios-card" style="border-left: 4px solid var(--blue); flex-direction: row; justify-content: space-between; align-items: center;">
                 <div>
-                    <span class="card-label" style="color:var(--blue)">Totale Godute (GG)</span>
+                    <span class="card-label" style="color:var(--blue)">Totale Anno Selezionato (GG)</span>
                     <div class="value" id="total-ferie-page">0,00</div>
                 </div>
+                <span style="font-size: 30px;">🏖️</span>
             </div>
         </section>
 
         <div id="lista-ferie" class="ios-input-group">
             </div>
     </main>
+
     <nav class="tab-bar">
-        <a href="index.html" class="tab-item">🏠<span>Home</span></a>
-        <a href="ferie.html" class="tab-item active">📅<span>Ferie</span></a>
-        <a href="malattia.html" class="tab-item">🤒<span>Mal</span></a>
-        <a href="calendario.html" class="tab-item">🗓️<span>Cal</span></a>
+        <a href="index.html" class="tab-item">
+            <span class="tab-icon">🏠</span>
+            <span class="tab-label">Home</span>
+        </a>
+        <a href="ferie.html" class="tab-item active">
+            <span class="tab-icon">📅</span>
+            <span class="tab-label">Ferie</span>
+        </a>
+        <a href="malattia.html" class="tab-item">
+            <span class="tab-icon">🛌</span>
+            <span class="tab-label">Salute</span>
+        </a>
+        <a href="calendario.html" class="tab-item">
+            <span class="tab-icon">🗓️</span>
+            <span class="tab-label">Cal</span>
+        </a>
     </nav>
+
     <script src="app.js"></script>
 </body>
+</html>
