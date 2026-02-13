@@ -3,38 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iWork - Ferie & ROL</title>
+    <title>Ferie e ROL - iWork 2026</title>
     <link rel="stylesheet" href="style.css">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body data-page="ferie">
+
     <header class="ios-navbar">
-        <span class="nav-brand">Storico Assenze</span>
+        <div class="nav-content"><span class="nav-brand">iWork 2026</span></div>
     </header>
 
     <main class="main-content">
-        <header class="dashboard-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
-            <div>
-                <p class="date-subtitle">Dettaglio Goduto</p>
-                <h1 class="large-title">Ferie & ROL</h1>
-            </div>
-            <select id="filter-anno" onchange="renderizzaListaSpecifica('ferie')" style="border:none; color:var(--blue); font-weight:600; background:none; margin-bottom:10px;">
-                <option value="2025">2025</option>
-                <option value="2026" selected>2026</option>
-                <option value="2027">2027</option>
-            </select>
+        <header class="dashboard-header">
+            <p class="date-subtitle">Riepilogo Residui</p>
+            <h1 class="large-title">Ferie e ROL</h1>
         </header>
 
-        <section style="padding: 0 16px 20px;">
-            <div class="ios-card" style="border-left: 4px solid var(--blue); flex-direction: row; justify-content: space-between; align-items: center;">
-                <div>
-                    <span class="card-label" style="color:var(--blue)">Totale Anno Selezionato (GG)</span>
-                    <div class="value" id="total-ferie-page">0,00</div>
-                </div>
-                <span style="font-size: 30px;">🏖️</span>
+        <section class="ios-card-grid">
+            <div class="ios-card" style="border-left: 4px solid var(--blue);">
+                <span class="card-label" style="color:var(--blue)">Ferie (gg)</span>
+                <div class="value" id="val-ferie">--</div>
+                <div class="card-detail">Prev: <span id="ferie-pian">--</span> gg</div>
+            </div>
+            <div class="ios-card" style="border-left: 4px solid var(--orange);">
+                <span class="card-label" style="color:var(--orange)">Permessi (gg)</span>
+                <div class="value" id="val-rol">--</div>
+                <div class="card-detail">Prev: <span id="rol-pian">--</span> gg</div>
             </div>
         </section>
+
+        <div style="display: flex; gap: 10px; padding: 0 16px 15px;">
+            <div style="flex: 2; background: #E5E5EA; padding: 8px 12px; border-radius: 8px; font-size: 15px; color: black; font-weight: 500;">Tutte</div>
+            <div style="flex: 1; background: #E5E5EA; padding: 8px 12px; border-radius: 8px; font-size: 15px; color: black; text-align: center; font-weight: 500;">2026</div>
+        </div>
 
         <div id="lista-ferie" class="ios-input-group">
             </div>
@@ -58,6 +60,40 @@
             <span class="tab-label">Cal</span>
         </a>
     </nav>
+
+    <div id="modal-overlay" class="modal-backdrop" onclick="toggleModal(false)"></div>
+    <div id="add-modal" class="ios-page-sheet">
+        <div class="modal-nav">
+            <button onclick="toggleModal(false)" class="btn-link">Annulla</button>
+            <span class="nav-brand" style="color:black">Modifica Record</span>
+            <button onclick="saveData()" class="btn-link" style="font-weight:600">Salva</button>
+        </div>
+        <div class="modal-scroll-area">
+            <div class="ios-input-group">
+                <div class="ios-input-row">
+                    <label>Tipo</label>
+                    <select id="in-tipo">
+                        <option value="ferie">Ferie Individuali</option>
+                        <option value="ferie_az">Ferie Aziendali</option>
+                        <option value="rol">ROL</option>
+                        <option value="conto">Banca Ore</option>
+                    </select>
+                </div>
+                <div class="ios-input-row">
+                    <label>Ore</label>
+                    <input type="number" id="in-ore" step="0.5">
+                </div>
+                <div class="ios-input-row">
+                    <label>Data</label>
+                    <input type="date" id="in-data">
+                </div>
+                <div class="ios-input-row" style="justify-content: space-between;">
+                    <label>Pianificato</label>
+                    <input type="checkbox" id="in-pianificato" style="width:22px; height:22px;">
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>

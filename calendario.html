@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iWork - Calendario</title>
+    <title>Calendario iWork 2026</title>
     <link rel="stylesheet" href="style.css">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body data-page="calendario">
+
     <header class="ios-navbar">
-        <span class="nav-brand">Presenze 2026</span>
+        <div class="nav-content"><span class="nav-brand">iWork 2026</span></div>
     </header>
 
     <main class="main-content">
@@ -19,6 +20,18 @@
             <h1 class="large-title">Calendario</h1>
         </header>
 
+        <div style="display: flex; gap: 15px; padding: 0 16px 20px; font-size: 13px; font-weight: 500;">
+            <div style="display: flex; align-items: center; gap: 5px;">
+                <span style="width: 12px; height: 12px; background: var(--blue); border-radius: 3px;"></span> Ferie
+            </div>
+            <div style="display: flex; align-items: center; gap: 5px;">
+                <span style="width: 12px; height: 12px; background: var(--purple); border-radius: 3px;"></span> Malattia
+            </div>
+            <div style="display: flex; align-items: center; gap: 5px;">
+                <span style="width: 12px; height: 12px; background: var(--orange); border-radius: 3px;"></span> ROL
+            </div>
+        </div>
+
         <div class="calendar-wrapper">
             <table class="calendar-table">
                 <thead id="calendarHeader">
@@ -26,18 +39,6 @@
                 <tbody id="calendarBody">
                     </tbody>
             </table>
-        </div>
-
-        <div style="padding: 20px 16px; display: flex; flex-wrap: wrap; gap: 10px;">
-            <div style="display:flex; align-items:center; font-size:12px;">
-                <div style="width:12px; height:12px; background:var(--blue); border-radius:3px; margin-right:5px;"></div> Ferie
-            </div>
-            <div style="display:flex; align-items:center; font-size:12px;">
-                <div style="width:12px; height:12px; background:var(--purple); border-radius:3px; margin-right:5px;"></div> Malattia
-            </div>
-            <div style="display:flex; align-items:center; font-size:12px;">
-                <div style="width:12px; height:12px; background:var(--orange); border-radius:3px; margin-right:5px;"></div> ROL
-            </div>
         </div>
     </main>
 

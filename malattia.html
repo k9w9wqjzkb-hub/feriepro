@@ -2,31 +2,90 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Salute - iWork 2026</title>
     <link rel="stylesheet" href="style.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body data-page="malattia">
-    <header class="ios-navbar"><span class="nav-brand">Salute</span></header>
+
+    <header class="ios-navbar">
+        <div class="nav-content"><span class="nav-brand">iWork 2026</span></div>
+    </header>
+
     <main class="main-content">
-        <header class="dashboard-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
-            <div><p class="date-subtitle">Storico</p><h1 class="large-title">Malattia</h1></div>
-            <select id="filter-anno" onchange="renderizzaListaSpecifica('malattia')" style="border:none; color:var(--blue); font-weight:600; background:none; margin-bottom:10px;"></select>
+        <header class="dashboard-header">
+            <p class="date-subtitle">Riepilogo Eventi</p>
+            <h1 class="large-title">Malattia</h1>
         </header>
+        
         <section style="padding: 0 16px 20px;">
             <div class="ios-card" style="border-left: 4px solid var(--purple);">
-                <span class="card-icon">🤒</span>
-                <span class="card-label" style="color:var(--purple)">Giorni Totali</span>
+                <span class="card-label" style="color:var(--purple)">Giorni Totali 2026</span>
                 <div class="value" id="total-malattia">0,00</div>
             </div>
         </section>
-        <div id="lista-malattia" class="ios-input-group"></div>
+
+        <div style="display: flex; gap: 10px; padding: 0 16px 15px;">
+            <div style="flex: 2; background: #E5E5EA; padding: 8px 12px; border-radius: 8px; font-size: 15px; color: black; font-weight: 500;">Tutte</div>
+            <div style="flex: 1; background: #E5E5EA; padding: 8px 12px; border-radius: 8px; font-size: 15px; color: black; text-align: center; font-weight: 500;">2026</div>
+        </div>
+
+        <div id="lista-malattia" class="ios-input-group">
+            </div>
     </main>
+
+    <div id="modal-overlay" class="modal-backdrop" onclick="toggleModal(false)"></div>
+    <div id="add-modal" class="ios-page-sheet">
+        <div class="modal-nav">
+            <button onclick="toggleModal(false)" class="btn-link">Annulla</button>
+            <span class="nav-brand" style="color:black">Modifica Record</span>
+            <button onclick="saveData()" class="btn-link" style="font-weight:700;">Salva</button>
+        </div>
+        <div class="modal-scroll-area">
+            <div class="ios-input-group">
+                <div class="ios-input-row">
+                    <label>Tipo</label>
+                    <select id="in-tipo">
+                        <option value="malattia">Malattia</option>
+                        <option value="avis">AVIS</option>
+                        <option value="ferie">Ferie</option>
+                        <option value="rol">ROL</option>
+                    </select>
+                </div>
+                <div class="ios-input-row">
+                    <label>Ore</label>
+                    <input type="number" id="in-ore" step="0.5">
+                </div>
+                <div class="ios-input-row">
+                    <label>Data</label>
+                    <input type="date" id="in-data">
+                </div>
+                <input type="checkbox" id="in-pianificato" style="display:none">
+            </div>
+        </div>
+    </div>
+
     <nav class="tab-bar">
-        <a href="index.html" class="tab-item"><span class="tab-icon">🏠</span>Home</a>
-        <a href="ferie.html" class="tab-item"><span class="tab-icon">📅</span>Ferie</a>
-        <a href="malattia.html" class="tab-item active"><span class="tab-icon">🛌</span>Salute</a>
-        <a href="calendario.html" class="tab-item"><span class="tab-icon">🗓️</span>Cal</a>
+        <a href="index.html" class="tab-item">
+            <span class="tab-icon">🏠</span>
+            <span class="tab-label">Home</span>
+        </a>
+        <a href="ferie.html" class="tab-item">
+            <span class="tab-icon">📅</span>
+            <span class="tab-label">Ferie</span>
+        </a>
+        <a href="malattia.html" class="tab-item active">
+            <span class="tab-icon">🛌</span>
+            <span class="tab-label">Salute</span>
+        </a>
+        <a href="calendario.html" class="tab-item">
+            <span class="tab-icon">🗓️</span>
+            <span class="tab-label">Cal</span>
+        </a>
     </nav>
+
     <script src="app.js"></script>
 </body>
 </html>

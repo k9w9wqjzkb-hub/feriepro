@@ -1,23 +1,31 @@
 {
-  "name": "iWork Ferie 2026",
+  "name": "iWork 2026",
   "short_name": "iWork",
-  "description": "Gestione Ferie, ROL e Malattia 2026",
+  "description": "Gestione avanzata Ferie, ROL, Malattia e Calendario",
   "start_url": "index.html",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#F2F2F7",
-  "theme_color": "#007AFF",
+  "background_color": "#141414",
+  "theme_color": "#000000",
+  "scope": ".",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }

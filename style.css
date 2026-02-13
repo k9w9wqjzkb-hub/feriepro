@@ -1,7 +1,9 @@
-/* --- IL TUO RESET E VARIABILI ORIGINALI --- */
+/* --- RESET E VARIABILI IOS --- */
 :root {
     --system-gray: #F2F2F7;
+    --apple-black: #141414; /* Nero profondo per la Tab Bar */
     --blue: #007AFF;
+    --light-blue: #5AC8FA;
     --red: #FF3B30;
     --orange: #FF9500;
     --purple: #AF52DE;
@@ -12,67 +14,225 @@
     --border: #C6C6C8;
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent; 
+    outline: none;
+}
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    margin: 0; padding: 0;
+    margin: 0;
+    padding: 0;
     background-color: var(--system-gray);
-    color: var(--text-main); line-height: 1.4; user-select: none;
+    color: var(--text-main);
+    line-height: 1.4;
+    user-select: none;
+    overflow-x: hidden;
 }
 
-/* --- LE TUE NAVBAR E CARDS ORIGINALI --- */
+/* --- LAYOUT & NAV --- */
 .ios-navbar {
-    position: fixed; top: 0; width: 100%;
+    position: fixed;
+    top: 0;
+    width: 100%;
     height: calc(44px + env(safe-area-inset-top));
-    background: rgba(249, 249, 249, 0.94);
-    backdrop-filter: blur(20px); border-bottom: 0.5px solid var(--border);
-    z-index: 1000; display: flex; align-items: flex-end; justify-content: center;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 0.5px solid var(--border);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-end; /* Allinea al basso per gestire la safe area top */
+    justify-content: center;
     padding-bottom: 10px;
 }
 
-.main-content { padding: calc(60px + env(safe-area-inset-top)) 0 120px 0; }
+.nav-brand { font-weight: 600; font-size: 17px; }
+
+.main-content {
+    padding: calc(70px + env(safe-area-inset-top)) 0 120px 0;
+}
+
 .dashboard-header { padding: 0 16px 20px; }
-.large-title { font-size: 34px; font-weight: 700; margin: 0; }
+.large-title { font-size: 34px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+.date-subtitle { font-size: 13px; color: var(--text-sec); text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
 
+/* --- CARDS --- */
 .ios-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 16px 20px; }
+
 .ios-card {
-    background: white; border-radius: 12px; padding: 16px;
-    display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    background: white;
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
-/* --- AGGIUNTA: DETTAGLIO PIANIFICATO NELLE CARD --- */
-.card-detail {
-    font-size: 11px; color: var(--text-sec); border-top: 0.5px solid #F2F2F7;
-    margin-top: 8px; padding-top: 4px;
-}
+.card-label { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.value { font-size: 28px; font-weight: 700; letter-spacing: -1px; margin-bottom: 4px; }
+.card-detail { font-size: 11px; color: var(--text-sec); font-weight: 500; }
 
-/* --- AGGIUNTA: TAB BAR BLACK GLOW (Pillola Nera) --- */
+/* --- TAB BAR MODERNA (BLACK GLOW) --- */
 .tab-bar {
-    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    width: 90%; max-width: 400px; height: 65px;
-    background: #1c1c1e; border-radius: 35px; display: flex;
-    justify-content: space-around; align-items: center; z-index: 1000;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-}
-.tab-item {
-    display: flex; flex-direction: column; align-items: center;
-    color: #8e8e93; text-decoration: none; font-size: 10px;
-}
-.tab-item.active { color: #5AC8FA; position: relative; }
-.tab-item.active::after {
-    content: ''; position: absolute; width: 45px; height: 45px;
-    border: 1.5px solid #5AC8FA; border-radius: 50%; top: -5px;
-    box-shadow: 0 0 10px rgba(90, 200, 250, 0.5);
+    position: fixed;
+    bottom: 30px; /* Fluttuante */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92%;
+    max-width: 400px;
+    height: 65px;
+    background: rgba(20, 20, 20, 0.96);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 1001;
+    border: 0.5px solid rgba(255, 255, 255, 0.08);
 }
 
-/* --- AGGIUNTA: SISTEMAZIONE MASCHERA MODALE --- */
-.modal-scroll-area { 
-    max-height: 70vh; overflow-y: auto; padding-bottom: 20px; 
+.tab-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #8E8E93;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 60px;
+    z-index: 2;
 }
+
+.tab-icon { font-size: 22px; margin-bottom: 2px; transition: 0.3s; }
+.tab-label { font-size: 10px; font-weight: 500; }
+
+/* Effetto Attivo */
+.tab-item.active { color: white; }
+.tab-item.active .tab-icon { transform: translateY(-3px); }
+
+.tab-item.active::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%);
+    width: 50px;
+    height: 50px;
+    background: rgba(90, 200, 250, 0.12);
+    border: 1.5px solid var(--light-blue);
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(90, 200, 250, 0.4);
+    z-index: -1;
+}
+
+/* --- CALENDARIO GRID --- */
+.calendar-wrapper {
+    overflow-x: auto;
+    background: white;
+    margin: 0 16px;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    -webkit-overflow-scrolling: touch;
+}
+
+.calendar-table { border-collapse: collapse; width: 100%; font-size: 11px; text-align: center; }
+.calendar-table th { background: #F9F9F9; padding: 10px 0; color: var(--text-sec); }
+.calendar-table td {
+    border: 0.5px solid #F2F2F7;
+    width: 34px;
+    height: 38px;
+    min-width: 34px;
+}
+
+.col-mese {
+    position: sticky;
+    left: 0;
+    background: white !important;
+    z-index: 10;
+    font-weight: 800;
+    color: var(--text-main);
+    border-right: 1px solid var(--system-gray) !important;
+}
+
+/* Colori Celle Calendario */
+.bg-sabato, .bg-domenica { background-color: #F9F9F9; color: #AEAEB2; }
+.bg-festivo { background-color: #FFECEC !important; color: var(--red); font-weight: bold; }
+.bg-ferie-ind { background-color: var(--blue); color: white; font-weight: bold; border-radius: 4px; }
+.bg-ferie-coll { background-color: var(--indigo); color: white; }
+.bg-malattia { background-color: var(--purple); color: white; }
+.text-rol { color: var(--orange); font-weight: 800; }
+
+/* --- LISTE E RECORD --- */
+.ios-input-group { background: white; margin: 0 16px 20px; border-radius: 12px; overflow: hidden; }
+.ios-input-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 0.5px solid #F2F2F7;
+    min-height: 50px;
+}
+.ios-input-row:last-child { border-bottom: none; }
+
+/* --- MODALI (PULL-UP SHEET) --- */
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    z-index: 2000;
+    animation: fadeIn 0.3s;
+}
+
 .ios-page-sheet {
-    position: fixed; bottom: -100%; left: 0; width: 100%;
-    background: var(--system-gray); border-radius: 12px 12px 0 0;
-    transition: bottom 0.3s ease-out; z-index: 2001;
+    position: fixed;
+    bottom: -100%;
+    left: 0;
+    width: 100%;
+    height: 85vh;
+    background: var(--system-gray);
+    border-radius: 15px 15px 0 0;
+    transition: bottom 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 2001;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
 }
+
 .ios-page-sheet.active { bottom: 0; }
+
+.modal-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: white;
+    border-bottom: 0.5px solid var(--border);
+    border-radius: 15px 15px 0 0;
+}
+
+.modal-scroll-area {
+    height: calc(100% - 60px);
+    overflow-y: auto;
+    padding: 20px 0;
+}
+
+/* --- INPUTS --- */
+input[type="number"], input[type="date"], input[type="text"], select {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 17px;
+    padding: 5px 0;
+    text-align: right;
+    font-family: inherit;
+}
+
+label { font-size: 17px; color: var(--text-main); }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

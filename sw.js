@@ -1,4 +1,4 @@
-const CACHE_NAME = 'iwork-v2026-v1';
+const CACHE_NAME = 'iwork-v3'; // Versione aggiornata per forzare il refresh dei nuovi stili
 const ASSETS = [
   './',
   'index.html',
@@ -12,32 +12,49 @@ const ASSETS = [
   'icon-512.png'
 ];
 
-// Installazione: Salva tutto in cache
+// Installazione: Creazione cache e pre-caricamento asset
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
+      console.log('iWork SW: Cache "'+ CACHE_NAME +'" creata con successo');
       return cache.addAll(ASSETS);
     })
   );
-  self.skipWaiting();
+  self.skipWaiting(); 
 });
 
-// Attivazione: Pulizia vecchie versioni
+// Attivazione: Pulizia automatica delle versioni precedenti (v1, v2)
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(keys.map((key) => {
-        if (key !== CACHE_NAME) return caches.delete(key);
+    caches.keys().then((keyList) => {
+      return Promise.all(keyList.map((key) => {
+        if (key !== CACHE_NAME) {
+          console.log('iWork SW: Eliminazione vecchia cache:', key);
+          return caches.delete(key);
+        }
       }));
     })
   );
+  return self.clients.claim(); 
 });
 
-// Fetch: Serve i file dalla cache se offline
+// Strategia: Cache First con fallback sul Network
 self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(e.request).then((res) => {
-      return res || fetch(e.request);
+      // Restituisce la risorsa se in cache, altrimenti va in rete
+      return res || fetch(e.request).then((networkResponse) => {
+        // Opzionale: aggiunge dinamicamente nuove risorse caricate alla cache
+        return caches.open(CACHE_NAME).then((cache) => {
+          cache.put(e.request, networkResponse.clone());
+          return networkResponse;
+        });
+      }).catch(() => {
+        // Se totalmente offline e la risorsa non è in cache
+        if (e.request.mode === 'navigate') {
+          return caches.match('index.html');
+        }
+      });
     })
   );
 });
