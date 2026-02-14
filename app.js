@@ -12,9 +12,8 @@ const ORE_GIORNO = 8;
 const defaultSettings = {
   residuiAP: { ferie: 36.15000, rol: 64.58249, conto: 2.00000 },
   spettanteAnnuo: { ferie: 216.00000, rol: 62.00000, conto: 0.00000 },
-  // Aggiornato automaticamente al primo avvio e ogni anno
-  dataInizioConteggio: `${new Date().getFullYear()}-01-01`,
-  annoRiferimento: new Date().getFullYear()
+  dataInizioConteggio: "2026-01-01",
+  annoRiferimento: 2026
 };
 
 /* =========================
@@ -108,23 +107,11 @@ function renderizzaCalendario() {
   if (!tableBody || !tableHeader) return;
 
   const mesi = ["GEN", "FEB", "MAR", "APR", "MAG", "GIU", "LUG", "AGO", "SET", "OTT", "NOV", "DIC"];
-
-  // ✅ Il calendario mostra sempre l'anno in corso
-  const anno = new Date().getFullYear();
+  const settings = getSettings();
+  const anno = settings.annoRiferimento || new Date().getFullYear();
 
   const movimenti = JSON.parse(localStorage.getItem('movimenti')) || [];
-
-  // Festività nazionali IT + Patrono Milano (07/12)
   const festivi = new Set(getFestivitaNazionaliIT(anno));
-  festivi.add(`${anno}-12-07`);
-
-  const sommaOre = (arr) => arr.reduce((acc, m) => acc + (Number(m.ore) || 0), 0);
-
-  const fmtOre = (n) => {
-    const v = Math.round((Number(n) || 0) * 100) / 100;
-    // 8 -> "8", 1.5 -> "1.5", 2.00 -> "2"
-    return v.toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
-  };
 
   // Header: MESE + 1-31 (RESET ogni render)
   tableHeader.innerHTML = '<th class="col-mese">MESE</th>';
@@ -151,39 +138,38 @@ function renderizzaCalendario() {
       let classe = "";
       let contenuto = "";
 
-      // Weekend
+      // Weekend (classi coerenti con calendario.html)
       if (dow === 6) classe = "bg-sabato";
       if (dow === 0) classe = "bg-domenica";
 
-      // Festivi (rosso)
-      if (festivi.has(dataISO)) {
-        classe = "bg-festivo";
-        if (dataISO === `${anno}-12-07`) contenuto = "P"; // Patrono Milano
+      // Festivi nazionali
+      if (festivi.has(dataISO)) classe = "bg-festivo";
+
+      // Patrono Milano (Sant'Ambrogio) 07/12
+      if (dataISO === `${anno}-12-07`) {
+        classe = "bg-patrono";
+        contenuto = "P";
       }
 
-      // Movimenti: PRIORITÀ (malattia > ferie az. > ferie > rol > avis)
-      const dayMovs = movimenti.filter(m => m.data === dataISO);
-
-      if (dayMovs.length) {
-        const has = (t) => dayMovs.some(m => m.tipo === t);
-
-        if (has('malattia')) {
-          classe = "bg-malattia";
-          contenuto = "M";
-        } else if (has('ferie_az')) {
-          classe = "bg-ferie-coll";
-          contenuto = "AZ";
-        } else if (has('ferie')) {
-          const ore = sommaOre(dayMovs.filter(m => m.tipo === 'ferie'));
+      // Movimenti hanno priorità sul colore
+      const movGiorno = movimenti.find(m => m.data === dataISO);
+      if (movGiorno) {
+        if (movGiorno.tipo === 'ferie') {
           classe = "bg-ferie-ind";
-          contenuto = (Math.abs(ore - ORE_GIORNO) < 0.001) ? "F" : fmtOre(ore);
-        } else if (has('rol')) {
-          const ore = sommaOre(dayMovs.filter(m => m.tipo === 'rol'));
-          classe = "bg-rol";
-          contenuto = fmtOre(ore);
-        } else if (has('avis')) {
+          contenuto = "F";
+        } else if (movGiorno.tipo === 'ferie_az') {
+          classe = "bg-ferie-coll";
+          contenuto = "F";
+        } else if (movGiorno.tipo === 'malattia') {
+          classe = "bg-malattia";
+          contenuto = "";
+        } else if (movGiorno.tipo === 'avis') {
           classe = "bg-avis";
-          contenuto = "AV";
+          contenuto = "A";
+        } else if (movGiorno.tipo === 'rol') {
+          classe = "text-rol";
+          const ore = Number(movGiorno.ore);
+          contenuto = Number.isFinite(ore) ? String(ore) : "";
         }
       }
 
@@ -199,21 +185,9 @@ function renderizzaCalendario() {
    FUNZIONI CORE GESTIONE DATI
    ========================= */
 function initSettings() {
-  const currentYear = new Date().getFullYear();
-  let s = null;
-
-  try { s = JSON.parse(localStorage.getItem('userSettings')); } catch (e) { s = null; }
-
-  if (!s || typeof s !== 'object') {
-    s = JSON.parse(JSON.stringify(defaultSettings));
+  if (!localStorage.getItem('userSettings')) {
+    localStorage.setItem('userSettings', JSON.stringify(defaultSettings));
   }
-
-  if (!s.dataInizioConteggio) s.dataInizioConteggio = `${currentYear}-01-01`;
-
-  // Compatibilità: il calendario mostra sempre l'anno in corso
-  s.annoRiferimento = currentYear;
-
-  localStorage.setItem('userSettings', JSON.stringify(s));
 }
 
 function getSettings() {
@@ -267,7 +241,7 @@ function aggiornaInterfaccia(page) {
 
     // Nota: su "all" manteniamo lo storico tabellare completo,
     // ma i calcoli rimangono sull'anno selezionato (come nel tuo comportamento attuale).
-    if (annoM === annoSelezionato || (filtroAnnoVal === 'all' && m.tipo === 'malattia')) {
+    if (annoM === annoSelezionato) {
       if (m.tipo === 'malattia') {
         calcoli.malattia += ore;
       } else if (m.tipo.startsWith('mat_')) {
@@ -288,10 +262,21 @@ function aggiornaInterfaccia(page) {
     const el = document.getElementById(id);
     if (el) el.innerText = (ore / ORE_GIORNO).toFixed(2).replace('.', ',') + " gg";
   };
+  const setCardPian = (id, ore) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (ore > 0) el.innerText = "Pian: " + (ore / ORE_GIORNO).toFixed(2).replace('.', ',') + " gg";
+    else el.innerText = "";
+  };
+
 
   setCard('val-ferie', (calcoli.ferie.ap + calcoli.ferie.spet - calcoli.ferie.god));
   setCard('val-rol', (calcoli.rol.ap + calcoli.rol.spet - calcoli.rol.god));
   setCard('val-conto', (calcoli.conto.ap + calcoli.conto.spet - calcoli.conto.god));
+  setCardPian('val-ferie-pian', calcoli.ferie.pian);
+  setCardPian('val-rol-pian', calcoli.rol.pian);
+  setCardPian('val-conto-pian', calcoli.conto.pian);
+
 
   const elMal = document.getElementById('val-malattia');
   if (elMal) elMal.innerText = (calcoli.malattia / ORE_GIORNO).toFixed(2).replace('.', ',') + " gg";
@@ -347,7 +332,7 @@ function renderizzaTabella(page) {
         <td style="padding:12px;">${new Date(m.data).toLocaleDateString('it-IT')}</td>
         <td><span class="badge-${m.tipo.startsWith('mat_') ? 'maturazione' : m.tipo}">${label}</span></td>
         <td style="font-weight:700;">${oreTxt}</td>
-        <td><button onclick="elimina(${m.id})" style="border:none; background:none;">🗑️</button></td>
+        <td class="azioni-cell"><div class="azioni-wrap"><button class="btn-azione" onclick="modifica(${m.id})" aria-label="Modifica">✏️</button><button class="btn-azione" onclick="info(${m.id})" aria-label="Info">ℹ️</button><button class="btn-azione" onclick="elimina(${m.id})" aria-label="Elimina">🗑️</button></div></td>
       </tr>`;
     })
     .join('');
@@ -487,6 +472,80 @@ function elimina(id) {
   localStorage.setItem('movimenti', JSON.stringify(m.filter(x => x.id !== id)));
   location.reload();
 }
+
+function info(id) {
+  const m = JSON.parse(localStorage.getItem('movimenti')) || [];
+  const r = m.find(x => x.id === id);
+  if (!r) return alert("Record non trovato");
+
+  let label = r.tipo.replace('mat_', 'MAT. ').toUpperCase();
+  if (r.tipo === 'ferie_az') label = "FERIE AZ.";
+  if (r.tipo === 'malattia') label = "MALATTIA";
+  if (r.tipo === 'avis') label = "AVIS";
+
+  const ore = Number(r.ore) || 0;
+  const oreTxt = (r.tipo === 'avis') ? '-' : ore.toFixed(2) + 'h';
+  const pian = r.pianificato ? "Sì" : "No";
+  const note = (r.note || "").trim();
+
+  alert(
+    `Data: ${new Date(r.data).toLocaleDateString('it-IT')}\n` +
+    `Tipo: ${label}\n` +
+    `Ore: ${oreTxt}\n` +
+    (r.tipo !== 'malattia' ? `Pianificato: ${pian}\n` : "") +
+    (note ? `Note: ${note}` : "")
+  );
+}
+
+function modifica(id) {
+  const mov = JSON.parse(localStorage.getItem('movimenti')) || [];
+  const idx = mov.findIndex(x => x.id === id);
+  if (idx < 0) return alert("Record non trovato");
+
+  const r = mov[idx];
+
+  const data = prompt("Data (YYYY-MM-DD):", r.data);
+  if (data === null) return;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return alert("Formato data non valido (usa YYYY-MM-DD)");
+
+  let tipo = prompt(
+    "Tipo (ferie, ferie_az, rol, conto, avis, malattia, mat_ferie, mat_rol, mat_conto):",
+    r.tipo
+  );
+  if (tipo === null) return;
+  tipo = (tipo || "").trim();
+
+  const tipiValidi = new Set(['ferie','ferie_az','rol','conto','avis','malattia','mat_ferie','mat_rol','mat_conto']);
+  if (!tipiValidi.has(tipo)) return alert("Tipo non valido");
+
+  // ore default coerenti
+  let oreDefault = Number(r.ore) || 0;
+  if (tipo === 'malattia' || tipo === 'ferie_az') oreDefault = 8;
+  if (tipo === 'avis') oreDefault = 0;
+
+  let oreStr = prompt("Ore:", String(oreDefault).replace('.', ','));
+  if (oreStr === null) return;
+  oreStr = oreStr.replace(',', '.');
+  let ore = parseFloat(oreStr);
+  if (!Number.isFinite(ore)) ore = 0;
+
+  // Validazione ore: AVIS può essere 0, gli altri > 0
+  if (tipo !== 'avis') {
+    if (!Number.isFinite(ore) || ore <= 0) return alert("Inserisci un numero di ore > 0");
+  }
+
+  // Nota
+  const note = prompt("Note (opzionale):", r.note || "");
+  if (note === null) return;
+
+  // Manteniamo il flag pianificato se già presente, altrimenti false
+  const pianificato = !!r.pianificato;
+
+  mov[idx] = { ...r, data, tipo, ore, note, pianificato };
+  localStorage.setItem('movimenti', JSON.stringify(mov));
+  location.reload();
+}
+
 
 function setupDate() {
   const cd = document.getElementById('current-date');

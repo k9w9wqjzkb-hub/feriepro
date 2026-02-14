@@ -183,3 +183,16 @@ body {
 .box-green { background: #d11c1c; }
 .box-blue { background: #ff4800; }
 .box-grey { background: #d7d7da; }
+
+/* Azioni tabella (✏️ ℹ️ 🗑) allineate */
+.azioni-cell { text-align: right; padding-right: 10px; white-space: nowrap; }
+.azioni-wrap { display: inline-flex; align-items: center; gap: 10px; }
+.btn-azione {
+  border: none;
+  background: none;
+  font-size: 18px;
+  line-height: 1;
+  padding: 6px 4px;
+  cursor: pointer;
+}
+.btn-azione:active { transform: scale(0.92); }
