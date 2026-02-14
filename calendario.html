@@ -3,22 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iWork - Calendario Orizzontale</title>
+    <title>iWork - Calendario</title>
     <link rel="stylesheet" href="style.css">
     <style>
         :root {
             --sabato: #E5E5EA;
             --domenica: #8E8E93;
 
-            /* Richiesta: festività rosso, ferie az. arancione, ferie mie verde, ROL giallo, malattia marrone */
+            /* Richiesta: festività rosso, ferie aziendali arancione, ferie mie verde, ROL giallo, malattia marrone */
             --festivo: #FF3B30;   /* Rosso */
             --ferie-az: #FF9500;  /* Arancione */
             --ferie: #34C759;     /* Verde */
             --rol: #FFD60A;       /* Giallo */
             --malattia: #5D4037;  /* Marrone */
-
-            /* Avis (richiesta: arancio) */
             --avis: #FF9500;      /* Arancione */
+
+            /* Compattezza (restringe le righe) */
+            --cell-h: 4.2vh;      /* righe mesi */
+            --head-h: 3.6vh;      /* intestazione giorni */
+            --cell-font: 9px;
+            --head-font: 9px;
         }
 
         /* Forza il layout a tutto schermo */
@@ -41,12 +45,21 @@
             border: 0.5px solid #bbb;
             text-align: center;
             padding: 0;
-            height: 5.5vh; /* Altezza dinamica basata sul display orizzontale */
-            font-size: 10px;
         }
 
-        .col-mese { 
-            width: 50px; 
+        .grid-table th {
+            height: var(--head-h);
+            font-size: var(--head-font);
+            font-weight: 700;
+        }
+
+        .grid-table td {
+            height: var(--cell-h);
+            font-size: var(--cell-font);
+        }
+
+        .col-mese {
+            width: 50px;
             font-weight: 700;
             background: #f2f2f7;
             font-size: 10px !important;
@@ -57,12 +70,10 @@
         .bg-domenica { background-color: var(--domenica); color: white; }
 
         .bg-festivo { background-color: var(--festivo); color: white; }
-        .bg-ferie-coll { background-color: var(--ferie-az); color: white; } /* Ferie aziendali */
+        .bg-ferie-coll { background-color: var(--ferie-az); color: white; } /* Ferie aziendali (AZ) */
         .bg-ferie-ind { background-color: var(--ferie); color: white; }     /* Ferie personali */
-
-        .bg-rol { background-color: var(--rol); color: #000; font-weight: 800; font-size: 9px; } /* ROL */
-        .bg-malattia { background-color: var(--malattia); color: white; font-weight: 800; }      /* Malattia */
-
+        .bg-rol { background-color: var(--rol); color: #000; font-weight: 800; }
+        .bg-malattia { background-color: var(--malattia); color: white; font-weight: 800; }
         .bg-avis { background-color: var(--avis); color: white; font-weight: 800; }
 
         /* LEGENDA */
@@ -70,7 +81,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            padding: 10px 6px;
+            padding: 8px 6px;
             margin-top: 6px;
         }
         .legend-item {
@@ -109,7 +120,14 @@
             .tab-bar { display: none; }
             .ios-navbar { display: none; }
             .main-content { padding: 0 !important; }
-            .grid-table td, .grid-table th { height: 7.5vh; font-size: 11px; }
+
+            /* un po' più grande in landscape, ma sempre compatto */
+            :root {
+                --cell-h: 5.0vh;
+                --head-h: 4.0vh;
+                --cell-font: 10px;
+                --head-font: 10px;
+            }
 
             /* legenda più compatta in landscape */
             .calendar-legend { padding: 6px; gap: 6px; }
