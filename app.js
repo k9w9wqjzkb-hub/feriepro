@@ -307,11 +307,19 @@ function aggiornaInterfaccia(page) {
     if (!el) return;
     el.innerText = (ore > 0) ? ("Pian: " + fmtGG(ore)) : "";
   };
+  // Restanti (netto pianificato: saldo - pian)
+  const saldoFerie = (calcoli.ferie.ap + calcoli.ferie.spet - calcoli.ferie.god);
+  const saldoRol   = (calcoli.rol.ap + calcoli.rol.spet - calcoli.rol.god);
+  const saldoConto = (calcoli.conto.ap + calcoli.conto.spet - calcoli.conto.god);
 
-  // Restanti
-  setCard('val-ferie', (calcoli.ferie.ap + calcoli.ferie.spet - calcoli.ferie.god));
-  setCard('val-rol', (calcoli.rol.ap + calcoli.rol.spet - calcoli.rol.god));
-  setCard('val-conto', (calcoli.conto.ap + calcoli.conto.spet - calcoli.conto.god));
+  const dispFerie = Math.max(0, saldoFerie - calcoli.ferie.pian);
+  const dispRol   = Math.max(0, saldoRol   - calcoli.rol.pian);
+  const dispConto = Math.max(0, saldoConto - calcoli.conto.pian);
+
+  setCard('val-ferie', dispFerie);
+  setCard('val-rol', dispRol);
+  setCard('val-conto', dispConto);
+
 
   // Pianificato (se presenti gli elementi)
   setCardPian('val-ferie-pian', calcoli.ferie.pian);
@@ -576,18 +584,26 @@ function modifica(id) {
 
   const r = mov[idx];
 
+  // Supporto retrocompatibilità: in vecchie versioni poteva chiamarsi "soloPianificato"
+  const pianOld = !!(r.pianificato || r.soloPianificato);
+
+  // 1) DATA
   const data = prompt('Data (YYYY-MM-DD):', r.data);
   if (data === null) return;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return alert('Formato data non valido (usa YYYY-MM-DD)');
 
-  let tipo = prompt('Tipo (ferie, ferie_az, rol, conto, avis, malattia, mat_ferie, mat_rol, mat_conto):', r.tipo);
+  // 2) TIPO
+  let tipo = prompt(
+    'Tipo (ferie, ferie_az, rol, conto, avis, malattia, mat_ferie, mat_rol, mat_conto):',
+    r.tipo
+  );
   if (tipo === null) return;
   tipo = (tipo || '').trim();
 
   const tipiValidi = new Set(['ferie','ferie_az','rol','conto','avis','malattia','mat_ferie','mat_rol','mat_conto']);
   if (!tipiValidi.has(tipo)) return alert('Tipo non valido');
 
-  // ore default coerenti
+  // 3) ORE (default coerente col tipo)
   let oreDefault = Number(r.ore) || 0;
   if (tipo === 'malattia' || tipo === 'ferie_az') oreDefault = 8;
   if (tipo === 'avis') oreDefault = 0;
@@ -598,15 +614,20 @@ function modifica(id) {
   let ore = parseFloat(oreStr);
   if (!Number.isFinite(ore)) ore = 0;
 
+  // Validazione ore: AVIS può essere 0, gli altri > 0
   if (tipo !== 'avis') {
     if (!Number.isFinite(ore) || ore <= 0) return alert('Inserisci un numero di ore > 0');
+  } else {
+    // per AVIS accettiamo anche 0
+    if (!Number.isFinite(ore) || ore < 0) return alert('Inserisci un numero di ore valido (>= 0)');
   }
 
+  // 4) NOTE
   const note = prompt('Note (opzionale):', r.note || '');
   if (note === null) return;
 
-  // Pianificato (solo per ferie/rol/conto/ferie_az)
-  let pianificato = !!r.pianificato;
+  // 5) SOLO PIANIFICATO (solo per ferie/rol/conto/ferie_az)
+  let pianificato = pianOld;
   const canHavePian = (tipo === 'ferie' || tipo === 'ferie_az' || tipo === 'rol' || tipo === 'conto');
   if (canHavePian) {
     const resp = prompt('Solo Pianificato? (S/N)', pianificato ? 'S' : 'N');
@@ -617,6 +638,9 @@ function modifica(id) {
   }
 
   mov[idx] = { ...r, data, tipo, ore, note, pianificato };
+  // pulizia retrocompatibilità (se esiste)
+  delete mov[idx].soloPianificato;
+
   setMovimenti(mov);
   location.reload();
 }
