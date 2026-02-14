@@ -307,18 +307,15 @@ function aggiornaInterfaccia(page) {
     if (!el) return;
     el.innerText = (ore > 0) ? ("Pian: " + fmtGG(ore)) : "";
   };
-  // Restanti (netto pianificato: saldo - pian)
+  // ✅ NUMERO GRANDE = EFFETTIVI (saldo reale: AP + SPET − GOD)
   const saldoFerie = (calcoli.ferie.ap + calcoli.ferie.spet - calcoli.ferie.god);
   const saldoRol   = (calcoli.rol.ap + calcoli.rol.spet - calcoli.rol.god);
   const saldoConto = (calcoli.conto.ap + calcoli.conto.spet - calcoli.conto.god);
 
-  const dispFerie = Math.max(0, saldoFerie - calcoli.ferie.pian);
-  const dispRol   = Math.max(0, saldoRol   - calcoli.rol.pian);
-  const dispConto = Math.max(0, saldoConto - calcoli.conto.pian);
 
-  setCard('val-ferie', dispFerie);
-  setCard('val-rol', dispRol);
-  setCard('val-conto', dispConto);
+  setCard('val-ferie', saldoFerie);
+  setCard('val-rol', saldoRol);
+  setCard('val-conto', saldoConto);
 
 
   // Pianificato (se presenti gli elementi)
