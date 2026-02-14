@@ -1,170 +1,45 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iWork - Calendario</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        :root {
-            --sabato: #E5E5EA;
-            --domenica: #8E8E93;
-
-            /* Richiesta: festività rosso, ferie aziendali arancione, ferie mie verde, ROL giallo, malattia marrone */
-            --festivo: #FF3B30;   /* Rosso */
-            --ferie-az: #FF9500;  /* Arancione */
-            --ferie: #34C759;     /* Verde */
-            --rol: #FFD60A;       /* Giallo */
-            --malattia: #5D4037;  /* Marrone */
-            --avis: #FF9500;      /* Arancione */
-
-            /* Compattezza (restringe le righe) */
-            --cell-h: 4.2vh;      /* righe mesi */
-            --head-h: 3.6vh;      /* intestazione giorni */
-            --cell-font: 9px;
-            --head-font: 9px;
-        }
-
-        /* Forza il layout a tutto schermo */
-        .main-content { padding: 5px !important; margin: 0 !important; }
-
-        .calendar-wrapper {
-            width: 100%;
-            background: white;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .grid-table {
-            border-collapse: collapse;
-            width: 100%;
-            table-layout: fixed;
-        }
-
-        .grid-table th, .grid-table td {
-            border: 0.5px solid #bbb;
-            text-align: center;
-            padding: 0;
-        }
-
-        .grid-table th {
-            height: var(--head-h);
-            font-size: var(--head-font);
-            font-weight: 700;
-        }
-
-        .grid-table td {
-            height: var(--cell-h);
-            font-size: var(--cell-font);
-        }
-
-        .col-mese {
-            width: 50px;
-            font-weight: 700;
-            background: #f2f2f7;
-            font-size: 10px !important;
-        }
-
-        /* Colori calendario */
-        .bg-sabato { background-color: var(--sabato); }
-        .bg-domenica { background-color: var(--domenica); color: white; }
-
-        .bg-festivo { background-color: var(--festivo); color: white; }
-        .bg-ferie-coll { background-color: var(--ferie-az); color: white; } /* Ferie aziendali (AZ) */
-        .bg-ferie-ind { background-color: var(--ferie); color: white; }     /* Ferie personali */
-        .bg-rol { background-color: var(--rol); color: #000; font-weight: 800; }
-        .bg-malattia { background-color: var(--malattia); color: white; font-weight: 800; }
-        .bg-avis { background-color: var(--avis); color: white; font-weight: 800; }
-
-        /* LEGENDA */
-        .calendar-legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 8px 6px;
-            margin-top: 6px;
-        }
-        .legend-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 10px;
-            background: #f2f2f7;
-            border-radius: 999px;
-            font-size: 12px;
-            line-height: 1;
-            white-space: nowrap;
-        }
-        .legend-swatch {
-            width: 14px;
-            height: 14px;
-            border-radius: 4px;
-            border: 1px solid rgba(0,0,0,.18);
-            flex: 0 0 auto;
-        }
-        .sw-festivo { background: var(--festivo); }
-        .sw-ferie-az { background: var(--ferie-az); }
-        .sw-ferie { background: var(--ferie); }
-        .sw-rol { background: var(--rol); }
-        .sw-malattia { background: var(--malattia); }
-        .sw-avis { background: var(--avis); }
-
-        .legend-note {
-            padding: 0 6px 10px;
-            font-size: 12px;
-            color: #444;
-        }
-
-        /* Nascondi la tab-bar in orizzontale per guadagnare spazio */
-        @media (orientation: landscape) {
-            .tab-bar { display: none; }
-            .ios-navbar { display: none; }
-            .main-content { padding: 0 !important; }
-
-            /* un po' più grande in landscape, ma sempre compatto */
-            :root {
-                --cell-h: 5.0vh;
-                --head-h: 4.0vh;
-                --cell-font: 10px;
-                --head-font: 10px;
-            }
-
-            /* legenda più compatta in landscape */
-            .calendar-legend { padding: 6px; gap: 6px; }
-            .legend-item { padding: 5px 8px; font-size: 11px; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>iWork - Calendario</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body data-page="calendario">
-    <main class="main-content">
-        <div class="calendar-wrapper">
-            <table class="grid-table">
-                <thead>
-                    <tr id="calendarHeader"></tr>
-                </thead>
-                <tbody id="calendarBody"></tbody>
-            </table>
-        </div>
+  <header class="ios-navbar">
+    <div class="nav-content"><span class="nav-brand">Calendario</span></div>
+  </header>
 
-        <!-- LEGENDA COLORI -->
-        <div class="calendar-legend" aria-label="Legenda calendario">
-            <div class="legend-item"><span class="legend-swatch sw-festivo"></span>Festività (rosso)</div>
-            <div class="legend-item"><span class="legend-swatch sw-ferie-az"></span>Ferie aziendali (AZ)</div>
-            <div class="legend-item"><span class="legend-swatch sw-ferie"></span>Ferie mie (F / ore)</div>
-            <div class="legend-item"><span class="legend-swatch sw-rol"></span>ROL (ore)</div>
-            <div class="legend-item"><span class="legend-swatch sw-malattia"></span>Malattia (M)</div>
-            <div class="legend-item"><span class="legend-swatch sw-avis"></span>Avis (AV)</div>
-        </div>
-        <div class="legend-note">Nota: <b>P</b> = Patrono Milano (07/12).</div>
-    </main>
+  <main class="main-content">
+    <div class="calendar-wrapper">
+      <table class="calendar-table">
+        <thead>
+          <tr id="calendarHeader"></tr>
+        </thead>
+        <tbody id="calendarBody"></tbody>
+      </table>
+    </div>
 
-    <nav class="tab-bar">
-        <a href="index.html" class="tab-item">🏠<span>Home</span></a>
-        <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
-        <a href="malattia.html" class="tab-item">🤒<span>Mal</span></a>
-        <a href="calendario.html" class="tab-item active">🗓️<span>Cal</span></a>
-    </nav>
+    <div class="legend-container">
+      <div class="legend-item"><i style="background: var(--red);"></i>Festività</div>
+      <div class="legend-item"><i style="background: var(--orange);"></i>Ferie Aziendali</div>
+      <div class="legend-item"><i style="background: var(--green);"></i>Ferie Personali</div>
+      <div class="legend-item"><i style="background: var(--yellow);"></i>ROL</div>
+      <div class="legend-item"><i style="background: var(--brown);"></i>Malattia</div>
+      <div class="legend-item"><i style="background: var(--blue);"></i>AVIS</div>
+      <div class="legend-item"><i style="background: #D1D1D6;"></i>Weekend</div>
+      <div class="legend-item"><i style="background: white; border:2px dashed rgba(0,0,0,0.55);"></i>Pianificato</div>
+    </div>
+  </main>
 
-    <script src="app.js"></script>
+  <nav class="tab-bar">
+    <a href="index.html" class="tab-item">🏠<span>Home</span></a>
+    <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
+    <a href="malattia.html" class="tab-item">🤒<span>Malattia</span></a>
+    <a href="calendario.html" class="tab-item active">🗓️<span>Calendario</span></a>
+  </nav>
+
+  <script src="app.js"></script>
 </body>
 </html>
