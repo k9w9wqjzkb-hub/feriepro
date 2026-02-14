@@ -30,7 +30,11 @@ function todayLocalISO() {
   return isoLocalDate(t.getFullYear(), t.getMonth(), t.getDate());
 }
 
-// Calcolo Pasqua (Meeus/Jones/Butcher) -> Date
+function toITDate(iso) {
+  return new Date(iso).toLocaleDateString('it-IT');
+}
+
+// Calcolo Pasqua (Meeus/Jones/Butcher)
 function getPasqua(anno) {
   const a = anno % 19;
   const b = Math.floor(anno / 100);
@@ -44,24 +48,15 @@ function getPasqua(anno) {
   const k = c % 4;
   const l = (32 + 2 * e + 2 * i - h - k) % 7;
   const m = Math.floor((a + 11 * h + 22 * l) / 451);
-  const month = Math.floor((h + l - 7 * m + 114) / 31); // 3=Mar, 4=Apr
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
   const day = ((h + l - 7 * m + 114) % 31) + 1;
   return new Date(anno, month - 1, day);
 }
 
 function getFestivitaNazionaliIT(anno) {
-  // Fisse (mese 0-based)
   const fixed = [
-    [0, 1],   // 1/1
-    [0, 6],   // 6/1
-    [3, 25],  // 25/4
-    [4, 1],   // 1/5
-    [5, 2],   // 2/6
-    [7, 15],  // 15/8
-    [10, 1],  // 1/11
-    [11, 8],  // 8/12
-    [11, 25], // 25/12
-    [11, 26], // 26/12
+    [0, 1], [0, 6], [3, 25], [4, 1], [5, 2],
+    [7, 15], [10, 1], [11, 8], [11, 25], [11, 26],
   ].map(([m0, d]) => isoLocalDate(anno, m0, d));
 
   const pasqua = getPasqua(anno);
@@ -75,6 +70,24 @@ function getFestivitaNazionaliIT(anno) {
 }
 
 /* =========================
+   STORAGE
+   ========================= */
+function initSettings() {
+  if (!localStorage.getItem('userSettings')) {
+    localStorage.setItem('userSettings', JSON.stringify(defaultSettings));
+  }
+}
+function getSettings() {
+  return JSON.parse(localStorage.getItem('userSettings')) || defaultSettings;
+}
+function getMovimenti() {
+  return JSON.parse(localStorage.getItem('movimenti')) || [];
+}
+function setMovimenti(m) {
+  localStorage.setItem('movimenti', JSON.stringify(m));
+}
+
+/* =========================
    INIT
    ========================= */
 window.onload = () => {
@@ -84,13 +97,11 @@ window.onload = () => {
 
   popolaFiltroAnni();
 
-  // Gestione Eventi Filtri
   const fA = document.getElementById('filter-anno');
   const fT = document.getElementById('filter-tipo');
-  if (fA) fA.onchange = () => { renderizzaTabella(activePage); aggiornaInterfaccia(activePage); };
-  if (fT) fT.onchange = () => { renderizzaTabella(activePage); aggiornaInterfaccia(activePage); };
+  if (fA) fA.onchange = () => { renderizzaTabella(activePage); aggiornaInterfaccia(activePage); if (activePage === 'calendario') renderizzaCalendario(); };
+  if (fT) fT.onchange = () => { renderizzaTabella(activePage); aggiornaInterfaccia(activePage); if (activePage === 'calendario') renderizzaCalendario(); };
 
-  // Inizializzazione in base alla pagina
   aggiornaInterfaccia(activePage);
   if (document.getElementById('history-body')) renderizzaTabella(activePage);
   if (activePage === 'calendario') renderizzaCalendario();
@@ -99,7 +110,7 @@ window.onload = () => {
 };
 
 /* =========================
-   LOGICA CALENDARIO ORIZZONTALE
+   CALENDARIO
    ========================= */
 function renderizzaCalendario() {
   const tableBody = document.getElementById('calendarBody');
@@ -107,18 +118,23 @@ function renderizzaCalendario() {
   if (!tableBody || !tableHeader) return;
 
   const mesi = ["GEN", "FEB", "MAR", "APR", "MAG", "GIU", "LUG", "AGO", "SET", "OTT", "NOV", "DIC"];
-  const settings = getSettings();
-  const anno = settings.annoRiferimento || new Date().getFullYear();
+  const anno = new Date().getFullYear(); // sempre anno corrente
 
-  const movimenti = JSON.parse(localStorage.getItem('movimenti')) || [];
+  const movimenti = getMovimenti().filter(m => {
+    const y = new Date(m.data).getFullYear();
+    return y === anno;
+  });
+
   const festivi = new Set(getFestivitaNazionaliIT(anno));
+  const patrono = `${anno}-12-07`; // Milano (Sant'Ambrogio)
 
-  // Header: MESE + 1-31 (RESET ogni render)
+  // Header: MESE + 1-31
   tableHeader.innerHTML = '<th class="col-mese">MESE</th>';
   for (let i = 1; i <= 31; i++) tableHeader.innerHTML += `<th>${i}</th>`;
 
-  // Body: reset
   tableBody.innerHTML = '';
+
+  const sumOre = (arr) => arr.reduce((acc, x) => acc + (Number(x.ore) || 0), 0);
 
   mesi.forEach((mese, indexMese) => {
     let riga = `<tr><td class="col-mese">${mese}</td>`;
@@ -126,7 +142,6 @@ function renderizzaCalendario() {
     for (let giorno = 1; giorno <= 31; giorno++) {
       const dt = new Date(anno, indexMese, giorno);
 
-      // giorno non valido per quel mese
       if (dt.getMonth() !== indexMese) {
         riga += `<td style="background:#F2F2F7;"></td>`;
         continue;
@@ -138,39 +153,61 @@ function renderizzaCalendario() {
       let classe = "";
       let contenuto = "";
 
-      // Weekend (classi coerenti con calendario.html)
-      if (dow === 6) classe = "bg-sabato";
-      if (dow === 0) classe = "bg-domenica";
+      // Weekend
+      if (dow === 0 || dow === 6) classe = "bg-weekend";
 
-      // Festivi nazionali
-      if (festivi.has(dataISO)) classe = "bg-festivo";
-
-      // Patrono Milano (Sant'Ambrogio) 07/12
-      if (dataISO === `${anno}-12-07`) {
-        classe = "bg-patrono";
-        contenuto = "P";
+      // Festivi nazionali + Patrono (rosso)
+      if (festivi.has(dataISO) || dataISO === patrono) {
+        classe = "bg-festivo";
+        if (dataISO === patrono) contenuto = "P";
       }
 
-      // Movimenti hanno priorità sul colore
-      const movGiorno = movimenti.find(m => m.data === dataISO);
-      if (movGiorno) {
-        if (movGiorno.tipo === 'ferie') {
-          classe = "bg-ferie-ind";
-          contenuto = "F";
-        } else if (movGiorno.tipo === 'ferie_az') {
-          classe = "bg-ferie-coll";
-          contenuto = "F";
-        } else if (movGiorno.tipo === 'malattia') {
-          classe = "bg-malattia";
-          contenuto = "";
-        } else if (movGiorno.tipo === 'avis') {
-          classe = "bg-avis";
-          contenuto = "A";
-        } else if (movGiorno.tipo === 'rol') {
-          classe = "text-rol";
-          const ore = Number(movGiorno.ore);
-          contenuto = Number.isFinite(ore) ? String(ore) : "";
-        }
+      // Movimenti del giorno (possono essere più di uno)
+      const movGiorno = movimenti.filter(m => m.data === dataISO);
+
+      if (movGiorno.length > 0) {
+        // raggruppo per tipo
+        const mal = movGiorno.filter(m => m.tipo === 'malattia');
+        const ferAz = movGiorno.filter(m => m.tipo === 'ferie_az');
+        const avis = movGiorno.filter(m => m.tipo === 'avis');
+        const ferie = movGiorno.filter(m => m.tipo === 'ferie');
+        const rol = movGiorno.filter(m => m.tipo === 'rol');
+        const conto = movGiorno.filter(m => m.tipo === 'conto');
+
+      // Priorità colori (come richiesto)
+      if (mal.length) {
+         classe = "bg-malattia";
+         contenuto = "M";
+
+      } else if (ferAz.length) {
+        classe = "bg-ferie-az";
+        contenuto = "AZ";
+        if (hasPian(ferAz)) classe += " is-pian";
+
+      } else if (avis.length) {
+        classe = "bg-avis";
+        contenuto = "AV"; // oppure "A"
+      // AVIS NON usa pianificato (ma se vuoi: abilitiamo anche qui)
+      // if (hasPian(avis)) classe += " is-pian";
+
+      } else if (ferie.length) {
+        classe = "bg-ferie";
+        const ore = sumOre(ferie);
+        contenuto = (Math.abs(ore - 8) < 0.001) ? "F" : String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
+        if (hasPian(ferie)) classe += " is-pian";
+
+      } else if (rol.length) {
+        classe = "bg-rol";
+        const ore = sumOre(rol);
+        contenuto = String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
+        if (hasPian(rol)) classe += " is-pian";
+
+      } else if (conto.length) {
+        classe = "bg-conto";
+        const ore = sumOre(conto);
+        contenuto = String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
+        if (hasPian(conto)) classe += " is-pian";
+      }
       }
 
       riga += `<td class="${classe}">${contenuto}</td>`;
@@ -182,23 +219,13 @@ function renderizzaCalendario() {
 }
 
 /* =========================
-   FUNZIONI CORE GESTIONE DATI
+   FILTRI
    ========================= */
-function initSettings() {
-  if (!localStorage.getItem('userSettings')) {
-    localStorage.setItem('userSettings', JSON.stringify(defaultSettings));
-  }
-}
-
-function getSettings() {
-  return JSON.parse(localStorage.getItem('userSettings')) || defaultSettings;
-}
-
 function popolaFiltroAnni() {
   const filterAnno = document.getElementById('filter-anno');
   if (!filterAnno) return;
 
-  const movimenti = JSON.parse(localStorage.getItem('movimenti')) || [];
+  const movimenti = getMovimenti();
   const anni = movimenti.map(m => new Date(m.data).getFullYear());
   anni.push(new Date().getFullYear());
 
@@ -213,14 +240,17 @@ function popolaFiltroAnni() {
   filterAnno.innerHTML = html;
 }
 
+/* =========================
+   DASHBOARD / CONSUNTIVO
+   ========================= */
 function aggiornaInterfaccia(page) {
-  const movimenti = JSON.parse(localStorage.getItem('movimenti')) || [];
+  const movimenti = getMovimenti();
   const settings = getSettings();
 
   const filtroAnnoEl = document.getElementById('filter-anno');
   const filtroAnnoVal = filtroAnnoEl ? filtroAnnoEl.value : 'all';
 
-  // Manteniamo il comportamento attuale: se "all", per le card usiamo l'anno corrente
+  // Se "all" => per le CARD uso anno corrente (così hai un riferimento pratico)
   const annoSelezionato = (filtroAnnoEl && filtroAnnoVal !== 'all')
     ? parseInt(filtroAnnoVal, 10)
     : new Date().getFullYear();
@@ -235,53 +265,60 @@ function aggiornaInterfaccia(page) {
   };
 
   movimenti.forEach(m => {
-    const dataM = new Date(m.data);
-    const annoM = dataM.getFullYear();
+    const annoM = new Date(m.data).getFullYear();
     const ore = Number(m.ore) || 0;
 
-    // Nota: su "all" manteniamo lo storico tabellare completo,
-    // ma i calcoli rimangono sull'anno selezionato (come nel tuo comportamento attuale).
-    if (annoM === annoSelezionato) {
-      if (m.tipo === 'malattia') {
-        calcoli.malattia += ore;
-      } else if (m.tipo.startsWith('mat_')) {
-        const cat = m.tipo.split('_')[1];
-        if (calcoli[cat]) calcoli[cat].spet += ore;
-      } else if (m.tipo !== 'avis') {
-        let tipoReale = (m.tipo === 'ferie_az') ? 'ferie' : m.tipo;
-        if (calcoli[tipoReale]) {
-          if (m.pianificato) calcoli[tipoReale].pian += ore;
-          else calcoli[tipoReale].god += ore;
-        }
-      }
+    if (annoM !== annoSelezionato) return;
+
+    if (m.tipo === 'malattia') {
+      calcoli.malattia += ore;
+      return;
     }
+
+    if (m.tipo.startsWith('mat_')) {
+      const cat = m.tipo.split('_')[1];
+      if (calcoli[cat]) calcoli[cat].spet += ore;
+      return;
+    }
+
+    if (m.tipo === 'avis') return;
+
+    // ferie_az conta nella famiglia ferie
+    let tipoReale = (m.tipo === 'ferie_az') ? 'ferie' : m.tipo;
+
+    if (!calcoli[tipoReale]) return;
+
+    if (m.pianificato) calcoli[tipoReale].pian += ore;
+    else calcoli[tipoReale].god += ore;
   });
 
-  // CARD GG (2 decimali)
+  const fmtGG = (ore) => (ore / ORE_GIORNO).toFixed(2).replace('.', ',') + " gg";
+
   const setCard = (id, ore) => {
     const el = document.getElementById(id);
-    if (el) el.innerText = (ore / ORE_GIORNO).toFixed(2).replace('.', ',') + " gg";
+    if (el) el.innerText = fmtGG(ore);
   };
+
   const setCardPian = (id, ore) => {
     const el = document.getElementById(id);
     if (!el) return;
-    if (ore > 0) el.innerText = "Pian: " + (ore / ORE_GIORNO).toFixed(2).replace('.', ',') + " gg";
-    else el.innerText = "";
+    el.innerText = (ore > 0) ? ("Pian: " + fmtGG(ore)) : "";
   };
 
-
+  // Restanti (AP + SPET - GOD)
   setCard('val-ferie', (calcoli.ferie.ap + calcoli.ferie.spet - calcoli.ferie.god));
   setCard('val-rol', (calcoli.rol.ap + calcoli.rol.spet - calcoli.rol.god));
   setCard('val-conto', (calcoli.conto.ap + calcoli.conto.spet - calcoli.conto.god));
+
+  // Pianificato
   setCardPian('val-ferie-pian', calcoli.ferie.pian);
   setCardPian('val-rol-pian', calcoli.rol.pian);
   setCardPian('val-conto-pian', calcoli.conto.pian);
 
-
   const elMal = document.getElementById('val-malattia');
-  if (elMal) elMal.innerText = (calcoli.malattia / ORE_GIORNO).toFixed(2).replace('.', ',') + " gg";
+  if (elMal) elMal.innerText = fmtGG(calcoli.malattia);
 
-  // TABELLA CONSUNTIVO
+  // TABELLA CONSUNTIVO (ore, come prima)
   const tbody = document.getElementById('consuntivo-body');
   if (tbody) {
     tbody.innerHTML = '';
@@ -299,8 +336,11 @@ function aggiornaInterfaccia(page) {
   }
 }
 
+/* =========================
+   REPORT TABLE
+   ========================= */
 function renderizzaTabella(page) {
-  const mov = JSON.parse(localStorage.getItem('movimenti')) || [];
+  const mov = getMovimenti();
   const tbody = document.getElementById('history-body');
   if (!tbody) return;
 
@@ -324,22 +364,36 @@ function renderizzaTabella(page) {
     .map(m => {
       let label = m.tipo.replace('mat_', 'MAT. ').toUpperCase();
       if (m.tipo === 'ferie_az') label = "FERIE AZ.";
+      if (m.tipo === 'malattia') label = "MALATTIA";
+      if (m.tipo === 'avis') label = "AVIS";
 
       const oreNum = Number(m.ore);
       const oreTxt = (m.tipo === 'avis') ? '-' : (Number.isFinite(oreNum) ? oreNum.toFixed(2) + 'h' : '0.00h');
 
-      return `<tr style="border-bottom:0.5px solid #EEE;">
-        <td style="padding:12px;">${new Date(m.data).toLocaleDateString('it-IT')}</td>
-        <td><span class="badge-${m.tipo.startsWith('mat_') ? 'maturazione' : m.tipo}">${label}</span></td>
+      // piccolo indicatore pianificato (solo per ferie/rol/conto/ferie_az)
+      const isPian = !!m.pianificato && (m.tipo === 'ferie' || m.tipo === 'ferie_az' || m.tipo === 'rol' || m.tipo === 'conto');
+      const pianTxt = isPian ? ' <span style="color:#8E8E93; font-weight:700;">(P)</span>' : '';
+
+      const badgeClass = m.tipo.startsWith('mat_') ? 'maturazione' : m.tipo;
+
+      return `<tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+        <td style="padding:12px;">${toITDate(m.data)}</td>
+        <td><span class="badge-${badgeClass}">${label}</span>${pianTxt}</td>
         <td style="font-weight:700;">${oreTxt}</td>
-        <td class="azioni-cell"><div class="azioni-wrap"><button class="btn-azione" onclick="modifica(${m.id})" aria-label="Modifica">✏️</button><button class="btn-azione" onclick="info(${m.id})" aria-label="Info">ℹ️</button><button class="btn-azione" onclick="elimina(${m.id})" aria-label="Elimina">🗑️</button></div></td>
+        <td class="azioni-cell">
+          <div class="azioni-wrap">
+            <button class="btn-azione" onclick="modifica(${m.id})" aria-label="Modifica">✏️</button>
+            <button class="btn-azione" onclick="info(${m.id})" aria-label="Info">ℹ️</button>
+            <button class="btn-azione" onclick="elimina(${m.id})" aria-label="Elimina">🗑️</button>
+          </div>
+        </td>
       </tr>`;
     })
     .join('');
 }
 
 /* =========================
-   FUNZIONI INTERFACCIA
+   UI (modal / sheet)
    ========================= */
 function toggleModal(s) {
   document.getElementById('add-modal')?.classList.toggle('active', !!s);
@@ -355,13 +409,13 @@ function toggleSheet(s) {
 }
 
 /* =========================
-   FUNZIONI DI SISTEMA
+   CONSOLIDA / AZZERA
    ========================= */
 function azzeraGoduti() {
   if (!confirm("Consolidare il saldo attuale al 01/01?")) return;
 
   let s = getSettings();
-  const mov = JSON.parse(localStorage.getItem('movimenti')) || [];
+  const mov = getMovimenti();
   const dInizio = new Date(s.dataInizioConteggio);
 
   ['ferie', 'rol', 'conto'].forEach(cat => {
@@ -371,7 +425,10 @@ function azzeraGoduti() {
       if (new Date(m.data) >= dInizio) {
         const o = Number(m.ore) || 0;
         if (m.tipo === 'mat_' + cat) mat += o;
-        else if (m.tipo === cat || (cat === 'ferie' && m.tipo === 'ferie_az')) god += o;
+        else if (m.tipo === cat || (cat === 'ferie' && m.tipo === 'ferie_az')) {
+          // consolido solo i GODUTI (non i pianificati)
+          if (!m.pianificato) god += o;
+        }
       }
     });
 
@@ -384,13 +441,19 @@ function azzeraGoduti() {
   location.reload();
 }
 
+/* =========================
+   SAVE / AUTO ORE
+   ========================= */
 function saveData() {
-  let t = document.getElementById('in-tipo').value;
-  let o = parseFloat(document.getElementById('in-ore').value);
-  const d = document.getElementById('in-data').value;
-  const note = document.getElementById('in-note') ? document.getElementById('in-note').value : "";
+  let t = document.getElementById('in-tipo')?.value;
+  let o = parseFloat(document.getElementById('in-ore')?.value);
+  const d = document.getElementById('in-data')?.value;
+  const note = document.getElementById('in-note') ? (document.getElementById('in-note').value || "") : "";
+
+  const pianFlag = document.getElementById('soloPianificato')?.checked || false;
 
   if (!d) return alert("Data mancante");
+  if (!t) return alert("Tipo mancante");
 
   if (t === 'maturazione') {
     const res = prompt("Destinazione? (ferie, rol, conto)");
@@ -398,7 +461,6 @@ function saveData() {
     else return;
   }
 
-  // Validazione ore: AVIS può essere 0, gli altri > 0
   const oreRichieste = (t !== 'avis');
   if (oreRichieste) {
     if (!Number.isFinite(o) || o <= 0) return alert("Inserisci un numero di ore > 0");
@@ -406,22 +468,28 @@ function saveData() {
     if (!Number.isFinite(o)) o = 0;
   }
 
-  const m = JSON.parse(localStorage.getItem('movimenti')) || [];
-  m.push({ tipo: t, ore: o, data: d, note, id: Date.now() });
-  localStorage.setItem('movimenti', JSON.stringify(m));
+  // pianificato si applica solo a ferie/rol/conto/ferie_az
+  const pianificato = (t === 'ferie' || t === 'ferie_az' || t === 'rol' || t === 'conto') ? pianFlag : false;
+
+  const m = getMovimenti();
+  m.push({ tipo: t, ore: o, data: d, note, pianificato, id: Date.now() });
+  setMovimenti(m);
   location.reload();
 }
 
 function gestisciAutoOre() {
-  const t = document.getElementById('in-tipo').value;
+  const t = document.getElementById('in-tipo')?.value;
   const i = document.getElementById('in-ore');
-  if (!i) return;
+  if (!i || !t) return;
 
   if (t === 'malattia' || t === 'ferie_az') i.value = 8;
   else if (t === 'avis') i.value = 0;
   else i.value = "";
 }
 
+/* =========================
+   SETTINGS PANEL
+   ========================= */
 function toggleSettings() {
   const p = document.getElementById('settings-panel');
   if (!p) return;
@@ -435,7 +503,7 @@ function toggleSettings() {
 
     c.innerHTML = '';
     ['ferie', 'rol', 'conto'].forEach(id => {
-      c.innerHTML += `<div style="margin-bottom:10px; border-bottom:1px solid #EEE; padding-bottom:10px;">
+      c.innerHTML += `<div style="margin-bottom:10px; border-bottom:1px solid rgba(0,0,0,0.06); padding-bottom:10px;">
         <div style="font-weight:700; font-size:12px; color:#007AFF;">${id.toUpperCase()}</div>
         <div style="display:flex; gap:8px;">
           <div style="flex:1;">
@@ -459,22 +527,25 @@ function toggleSettings() {
 function saveSettings() {
   const s = getSettings();
   ['ferie', 'rol', 'conto'].forEach(c => {
-    s.residuiAP[c] = parseFloat(document.getElementById(`set-ap-${c}`).value) || 0;
-    s.spettanteAnnuo[c] = parseFloat(document.getElementById(`set-spet-${c}`).value) || 0;
+    s.residuiAP[c] = parseFloat(document.getElementById(`set-ap-${c}`)?.value) || 0;
+    s.spettanteAnnuo[c] = parseFloat(document.getElementById(`set-spet-${c}`)?.value) || 0;
   });
   localStorage.setItem('userSettings', JSON.stringify(s));
   location.reload();
 }
 
+/* =========================
+   AZIONI RECORD
+   ========================= */
 function elimina(id) {
   if (!confirm("Eliminare?")) return;
-  const m = JSON.parse(localStorage.getItem('movimenti')) || [];
-  localStorage.setItem('movimenti', JSON.stringify(m.filter(x => x.id !== id)));
+  const m = getMovimenti();
+  setMovimenti(m.filter(x => x.id !== id));
   location.reload();
 }
 
 function info(id) {
-  const m = JSON.parse(localStorage.getItem('movimenti')) || [];
+  const m = getMovimenti();
   const r = m.find(x => x.id === id);
   if (!r) return alert("Record non trovato");
 
@@ -489,16 +560,16 @@ function info(id) {
   const note = (r.note || "").trim();
 
   alert(
-    `Data: ${new Date(r.data).toLocaleDateString('it-IT')}\n` +
+    `Data: ${toITDate(r.data)}\n` +
     `Tipo: ${label}\n` +
     `Ore: ${oreTxt}\n` +
-    (r.tipo !== 'malattia' ? `Pianificato: ${pian}\n` : "") +
+    ((r.tipo !== 'malattia' && !r.tipo.startsWith('mat_') && r.tipo !== 'avis') ? `Pianificato: ${pian}\n` : "") +
     (note ? `Note: ${note}` : "")
   );
 }
 
 function modifica(id) {
-  const mov = JSON.parse(localStorage.getItem('movimenti')) || [];
+  const mov = getMovimenti();
   const idx = mov.findIndex(x => x.id === id);
   if (idx < 0) return alert("Record non trovato");
 
@@ -529,24 +600,32 @@ function modifica(id) {
   let ore = parseFloat(oreStr);
   if (!Number.isFinite(ore)) ore = 0;
 
-  // Validazione ore: AVIS può essere 0, gli altri > 0
   if (tipo !== 'avis') {
     if (!Number.isFinite(ore) || ore <= 0) return alert("Inserisci un numero di ore > 0");
   }
 
-  // Nota
   const note = prompt("Note (opzionale):", r.note || "");
   if (note === null) return;
 
-  // Manteniamo il flag pianificato se già presente, altrimenti false
-  const pianificato = !!r.pianificato;
+  // Pianificato (solo per ferie/rol/conto/ferie_az)
+  let pianificato = !!r.pianificato;
+  const canHavePian = (tipo === 'ferie' || tipo === 'ferie_az' || tipo === 'rol' || tipo === 'conto');
+  if (canHavePian) {
+    const resp = prompt("Solo Pianificato? (S/N)", pianificato ? "S" : "N");
+    if (resp === null) return;
+    pianificato = String(resp).trim().toUpperCase().startsWith('S');
+  } else {
+    pianificato = false;
+  }
 
   mov[idx] = { ...r, data, tipo, ore, note, pianificato };
-  localStorage.setItem('movimenti', JSON.stringify(mov));
+  setMovimenti(mov);
   location.reload();
 }
 
-
+/* =========================
+   DATE + BACKUP
+   ========================= */
 function setupDate() {
   const cd = document.getElementById('current-date');
   if (cd) {
@@ -562,10 +641,7 @@ function setupDate() {
 }
 
 function exportBackup() {
-  const payload = {
-    m: JSON.parse(localStorage.getItem('movimenti')) || [],
-    s: getSettings()
-  };
+  const payload = { m: getMovimenti(), s: getSettings() };
   const b = new Blob([JSON.stringify(payload)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(b);

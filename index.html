@@ -4,12 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>iWork - Dashboard</title>
+
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
+
+    <!-- Cache bust per iOS (aiuta quando aggiorni su GitHub/Netlify) -->
+    <link rel="manifest" href="manifest.json?v=7">
+
+    <!-- iOS icons (consigliato) + fallback -->
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
     <link rel="apple-touch-icon" href="icon-192.png">
+
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
+
 <body data-page="index">
     <header class="ios-navbar">
         <div class="nav-content"><span class="nav-brand">iWork</span></div>
@@ -22,19 +30,28 @@
         </header>
 
         <section class="ios-card-grid">
+            <!-- FERIE -->
             <div class="ios-card" style="border-left: 4px solid var(--blue);">
                 <span class="card-label" style="color:var(--blue)">Ferie</span>
                 <span class="value" id="val-ferie">--</span>
+                <span class="subvalue" id="val-ferie-pian" style="font-size:12px; color:#8E8E93; margin-top:4px;"></span>
             </div>
+
+            <!-- ROL / PERMESSI -->
             <div class="ios-card" style="border-left: 4px solid var(--orange);">
                 <span class="card-label" style="color:var(--orange)">Permessi</span>
                 <span class="value" id="val-rol">--</span>
+                <span class="subvalue" id="val-rol-pian" style="font-size:12px; color:#8E8E93; margin-top:4px;"></span>
             </div>
+
+            <!-- CONTO ORE -->
             <div class="ios-card" style="border-left: 4px solid var(--green);">
                 <span class="card-label" style="color:var(--green)">Perm.B.Ore</span>
                 <span class="value" id="val-conto">--</span>
-<span class="subvalue" id="val-conto-pian" style="font-size:12px; color:#8E8E93; margin-top:4px;"></span>
+                <span class="subvalue" id="val-conto-pian" style="font-size:12px; color:#8E8E93; margin-top:4px;"></span>
             </div>
+
+            <!-- MALATTIA -->
             <div class="ios-card" style="border-left: 4px solid var(--red);">
                 <span class="card-label" style="color:var(--red)">Malattia</span>
                 <span class="value" id="val-malattia">--</span>
@@ -49,8 +66,10 @@
         </div>
     </main>
 
+    <!-- FAB -->
     <button class="ios-fab" onclick="toggleModal(true)">+</button>
 
+    <!-- MODAL: NUOVO RECORD -->
     <div id="modal-overlay" class="modal-backdrop" onclick="toggleModal(false)"></div>
     <div id="add-modal" class="ios-page-sheet" style="height: 72%;">
         <div class="modal-nav">
@@ -58,6 +77,7 @@
             <span class="modal-title" style="font-weight:600;">Nuovo Record</span>
             <button onclick="saveData()" class="btn-link" style="font-weight:700;">Aggiungi</button>
         </div>
+
         <div style="padding: 20px; background: #F2F2F7; height: 100%;">
             <div class="ios-input-group">
                 <div class="ios-input-row">
@@ -69,25 +89,38 @@
                         <option value="conto">Perm.B.Ore</option>
                         <option value="malattia">Malattia</option>
                         <option value="avis">🩸 AVIS</option>
-                        <option value="maturazione">➕ Maturazione</option>
                     </select>
                 </div>
+
                 <div class="ios-input-row">
                     <label>Ore</label>
                     <input type="number" id="in-ore" step="0.01" placeholder="0.00">
                 </div>
+
                 <div class="ios-input-row">
                     <label>Data</label>
                     <input type="date" id="in-data">
                 </div>
+
                 <div class="ios-input-row">
                     <label>Note</label>
                     <input type="text" id="in-note" placeholder="Opzionale">
                 </div>
+
+                <!-- ✅ Checkbox ripristinato -->
+                <div class="form-row checkbox-row">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="soloPianificato">
+                        <span class="checkmark"></span>
+                        Solo Pianificato
+                    </label>
+                </div>
+
             </div>
         </div>
     </div>
 
+    <!-- SHEET: CONSUNTIVO -->
     <div id="overlay-sheet" class="modal-backdrop" onclick="toggleSheet(false)"></div>
     <div id="ios-sheet" class="ios-page-sheet" style="height:92%;">
         <div class="modal-nav">
@@ -95,12 +128,14 @@
             <span class="modal-title">Consuntivo</span>
             <button onclick="toggleSheet(false)" class="btn-link" style="font-weight:700;">Fatto</button>
         </div>
+
         <div style="padding:20px; overflow-y:auto; height:calc(100% - 60px);">
             <div id="settings-panel" style="display:none; background:#F2F2F7; padding:15px; border-radius:14px; margin-bottom:20px; border: 1px solid #DDD;">
                 <h3 style="margin-top:0; font-size:16px;">Configurazione Residui (Ore)</h3>
                 <div id="settings-inputs"></div>
                 <button onclick="saveSettings()" class="ios-btn-blue" style="margin-top:10px; padding:12px;">Salva e Aggiorna</button>
             </div>
+
             <div class="consuntivo-container">
                 <table style="width:100%; border-collapse:collapse; font-size:12px;">
                     <thead>
@@ -115,10 +150,12 @@
                     <tbody id="consuntivo-body"></tbody>
                 </table>
             </div>
+
             <div style="margin-top:30px;">
                 <button onclick="exportBackup()" class="ios-btn-white" style="color:var(--blue); display:flex; justify-content:space-between;">
                     <span>Esporta Backup</span><span>📥</span>
                 </button>
+
                 <input type="file" id="importFile" style="display:none" onchange="importBackup(event)">
                 <button onclick="document.getElementById('importFile').click()" class="ios-btn-white" style="color:var(--orange); margin-top:10px; display:flex; justify-content:space-between;">
                     <span>Importa Backup</span><span>📤</span>
@@ -127,12 +164,14 @@
         </div>
     </div>
 
+    <!-- TAB BAR -->
     <nav class="tab-bar">
         <a href="index.html" class="tab-item active">🏠<span>Home</span></a>
         <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
         <a href="malattia.html" class="tab-item">🤒<span>Malattia</span></a>
         <a href="calendario.html" class="tab-item">🗓️<span>Calendario</span></a>
     </nav>
+
     <script src="app.js"></script>
 </body>
 </html>
