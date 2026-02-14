@@ -77,12 +77,15 @@ function initSettings() {
     localStorage.setItem('userSettings', JSON.stringify(defaultSettings));
   }
 }
+
 function getSettings() {
   return JSON.parse(localStorage.getItem('userSettings')) || defaultSettings;
 }
+
 function getMovimenti() {
   return JSON.parse(localStorage.getItem('movimenti')) || [];
 }
+
 function setMovimenti(m) {
   localStorage.setItem('movimenti', JSON.stringify(m));
 }
@@ -99,8 +102,16 @@ window.onload = () => {
 
   const fA = document.getElementById('filter-anno');
   const fT = document.getElementById('filter-tipo');
-  if (fA) fA.onchange = () => { renderizzaTabella(activePage); aggiornaInterfaccia(activePage); if (activePage === 'calendario') renderizzaCalendario(); };
-  if (fT) fT.onchange = () => { renderizzaTabella(activePage); aggiornaInterfaccia(activePage); if (activePage === 'calendario') renderizzaCalendario(); };
+  if (fA) fA.onchange = () => {
+    renderizzaTabella(activePage);
+    aggiornaInterfaccia(activePage);
+    if (activePage === 'calendario') renderizzaCalendario();
+  };
+  if (fT) fT.onchange = () => {
+    renderizzaTabella(activePage);
+    aggiornaInterfaccia(activePage);
+    if (activePage === 'calendario') renderizzaCalendario();
+  };
 
   aggiornaInterfaccia(activePage);
   if (document.getElementById('history-body')) renderizzaTabella(activePage);
@@ -110,63 +121,64 @@ window.onload = () => {
 };
 
 /* =========================
-   CALENDARIO
+   CALENDARIO (orizzontale)
+   - anno corrente
+   - festività rosso
+   - ferie aziendali arancio
+   - ferie personali verde
+   - ROL giallo
+   - malattia marrone
+   - AVIS blu
+   - pianificato: bordo tratteggiato (is-pian)
    ========================= */
 function renderizzaCalendario() {
   const tableBody = document.getElementById('calendarBody');
   const tableHeader = document.getElementById('calendarHeader');
   if (!tableBody || !tableHeader) return;
 
-  const mesi = ["GEN", "FEB", "MAR", "APR", "MAG", "GIU", "LUG", "AGO", "SET", "OTT", "NOV", "DIC"];
-  const anno = new Date().getFullYear(); // sempre anno corrente
+  const mesi = ["GEN", "FEB", "MAR", "APR", "MAG", "GIU", "LUG", "AGO", "SET", "OTT", "NOV", "DIC"]; 
+  const anno = new Date().getFullYear();
 
-  const movimenti = getMovimenti().filter(m => {
-    const y = new Date(m.data).getFullYear();
-    return y === anno;
-  });
-
+  const movimentiAnno = getMovimenti().filter(m => new Date(m.data).getFullYear() === anno);
   const festivi = new Set(getFestivitaNazionaliIT(anno));
-  const patrono = `${anno}-12-07`; // Milano (Sant'Ambrogio)
+  const patrono = `${anno}-12-07`; // Sant'Ambrogio
 
-  // Header: MESE + 1-31
+  // Header
   tableHeader.innerHTML = '<th class="col-mese">MESE</th>';
   for (let i = 1; i <= 31; i++) tableHeader.innerHTML += `<th>${i}</th>`;
 
   tableBody.innerHTML = '';
 
   const sumOre = (arr) => arr.reduce((acc, x) => acc + (Number(x.ore) || 0), 0);
+  const hasPian = (arr) => arr.some(x => !!x.pianificato);
 
   mesi.forEach((mese, indexMese) => {
     let riga = `<tr><td class="col-mese">${mese}</td>`;
 
     for (let giorno = 1; giorno <= 31; giorno++) {
       const dt = new Date(anno, indexMese, giorno);
-
       if (dt.getMonth() !== indexMese) {
         riga += `<td style="background:#F2F2F7;"></td>`;
         continue;
       }
 
       const dataISO = isoLocalDate(anno, indexMese, giorno);
-      const dow = dt.getDay(); // 0=Dom, 6=Sab
+      const dow = dt.getDay();
 
       let classe = "";
       let contenuto = "";
 
-      // Weekend
+      // weekend
       if (dow === 0 || dow === 6) classe = "bg-weekend";
 
-      // Festivi nazionali + Patrono (rosso)
+      // festività + patrono
       if (festivi.has(dataISO) || dataISO === patrono) {
         classe = "bg-festivo";
         if (dataISO === patrono) contenuto = "P";
       }
 
-      // Movimenti del giorno (possono essere più di uno)
-      const movGiorno = movimenti.filter(m => m.data === dataISO);
-
-      if (movGiorno.length > 0) {
-        // raggruppo per tipo
+      const movGiorno = movimentiAnno.filter(m => m.data === dataISO);
+      if (movGiorno.length) {
         const mal = movGiorno.filter(m => m.tipo === 'malattia');
         const ferAz = movGiorno.filter(m => m.tipo === 'ferie_az');
         const avis = movGiorno.filter(m => m.tipo === 'avis');
@@ -174,40 +186,33 @@ function renderizzaCalendario() {
         const rol = movGiorno.filter(m => m.tipo === 'rol');
         const conto = movGiorno.filter(m => m.tipo === 'conto');
 
-      // Priorità colori (come richiesto)
-      if (mal.length) {
-         classe = "bg-malattia";
-         contenuto = "M";
-
-      } else if (ferAz.length) {
-        classe = "bg-ferie-az";
-        contenuto = "AZ";
-        if (hasPian(ferAz)) classe += " is-pian";
-
-      } else if (avis.length) {
-        classe = "bg-avis";
-        contenuto = "AV"; // oppure "A"
-      // AVIS NON usa pianificato (ma se vuoi: abilitiamo anche qui)
-      // if (hasPian(avis)) classe += " is-pian";
-
-      } else if (ferie.length) {
-        classe = "bg-ferie";
-        const ore = sumOre(ferie);
-        contenuto = (Math.abs(ore - 8) < 0.001) ? "F" : String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
-        if (hasPian(ferie)) classe += " is-pian";
-
-      } else if (rol.length) {
-        classe = "bg-rol";
-        const ore = sumOre(rol);
-        contenuto = String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
-        if (hasPian(rol)) classe += " is-pian";
-
-      } else if (conto.length) {
-        classe = "bg-conto";
-        const ore = sumOre(conto);
-        contenuto = String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
-        if (hasPian(conto)) classe += " is-pian";
-      }
+        // Priorità: malattia > ferie aziendali > avis > ferie > rol > conto
+        if (mal.length) {
+          classe = "bg-malattia";
+          contenuto = "M";
+        } else if (ferAz.length) {
+          classe = "bg-ferie-az";
+          contenuto = "AZ";
+          if (hasPian(ferAz)) classe += " is-pian";
+        } else if (avis.length) {
+          classe = "bg-avis";
+          contenuto = "AV";
+        } else if (ferie.length) {
+          classe = "bg-ferie";
+          const ore = sumOre(ferie);
+          contenuto = (Math.abs(ore - 8) < 0.001) ? "F" : String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
+          if (hasPian(ferie)) classe += " is-pian";
+        } else if (rol.length) {
+          classe = "bg-rol";
+          const ore = sumOre(rol);
+          contenuto = String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
+          if (hasPian(rol)) classe += " is-pian";
+        } else if (conto.length) {
+          classe = "bg-conto";
+          const ore = sumOre(conto);
+          contenuto = String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
+          if (hasPian(conto)) classe += " is-pian";
+        }
       }
 
       riga += `<td class="${classe}">${contenuto}</td>`;
@@ -250,7 +255,7 @@ function aggiornaInterfaccia(page) {
   const filtroAnnoEl = document.getElementById('filter-anno');
   const filtroAnnoVal = filtroAnnoEl ? filtroAnnoEl.value : 'all';
 
-  // Se "all" => per le CARD uso anno corrente (così hai un riferimento pratico)
+  // Se "all" => per le CARD uso anno corrente
   const annoSelezionato = (filtroAnnoEl && filtroAnnoVal !== 'all')
     ? parseInt(filtroAnnoVal, 10)
     : new Date().getFullYear();
@@ -266,9 +271,9 @@ function aggiornaInterfaccia(page) {
 
   movimenti.forEach(m => {
     const annoM = new Date(m.data).getFullYear();
-    const ore = Number(m.ore) || 0;
-
     if (annoM !== annoSelezionato) return;
+
+    const ore = Number(m.ore) || 0;
 
     if (m.tipo === 'malattia') {
       calcoli.malattia += ore;
@@ -283,9 +288,7 @@ function aggiornaInterfaccia(page) {
 
     if (m.tipo === 'avis') return;
 
-    // ferie_az conta nella famiglia ferie
-    let tipoReale = (m.tipo === 'ferie_az') ? 'ferie' : m.tipo;
-
+    const tipoReale = (m.tipo === 'ferie_az') ? 'ferie' : m.tipo;
     if (!calcoli[tipoReale]) return;
 
     if (m.pianificato) calcoli[tipoReale].pian += ore;
@@ -305,12 +308,12 @@ function aggiornaInterfaccia(page) {
     el.innerText = (ore > 0) ? ("Pian: " + fmtGG(ore)) : "";
   };
 
-  // Restanti (AP + SPET - GOD)
+  // Restanti
   setCard('val-ferie', (calcoli.ferie.ap + calcoli.ferie.spet - calcoli.ferie.god));
   setCard('val-rol', (calcoli.rol.ap + calcoli.rol.spet - calcoli.rol.god));
   setCard('val-conto', (calcoli.conto.ap + calcoli.conto.spet - calcoli.conto.god));
 
-  // Pianificato
+  // Pianificato (se presenti gli elementi)
   setCardPian('val-ferie-pian', calcoli.ferie.pian);
   setCardPian('val-rol-pian', calcoli.rol.pian);
   setCardPian('val-conto-pian', calcoli.conto.pian);
@@ -318,7 +321,7 @@ function aggiornaInterfaccia(page) {
   const elMal = document.getElementById('val-malattia');
   if (elMal) elMal.innerText = fmtGG(calcoli.malattia);
 
-  // TABELLA CONSUNTIVO (ore, come prima)
+  // Consuntivo (ore)
   const tbody = document.getElementById('consuntivo-body');
   if (tbody) {
     tbody.innerHTML = '';
@@ -337,7 +340,7 @@ function aggiornaInterfaccia(page) {
 }
 
 /* =========================
-   REPORT TABLE
+   REPORT TABLE (✏️ ℹ️ 🗑)
    ========================= */
 function renderizzaTabella(page) {
   const mov = getMovimenti();
@@ -363,18 +366,17 @@ function renderizzaTabella(page) {
     .sort((a, b) => new Date(b.data) - new Date(a.data))
     .map(m => {
       let label = m.tipo.replace('mat_', 'MAT. ').toUpperCase();
-      if (m.tipo === 'ferie_az') label = "FERIE AZ.";
-      if (m.tipo === 'malattia') label = "MALATTIA";
-      if (m.tipo === 'avis') label = "AVIS";
+      if (m.tipo === 'ferie_az') label = 'FERIE AZ.';
+      if (m.tipo === 'malattia') label = 'MALATTIA';
+      if (m.tipo === 'avis') label = 'AVIS';
 
       const oreNum = Number(m.ore);
       const oreTxt = (m.tipo === 'avis') ? '-' : (Number.isFinite(oreNum) ? oreNum.toFixed(2) + 'h' : '0.00h');
 
-      // piccolo indicatore pianificato (solo per ferie/rol/conto/ferie_az)
+      const badgeClass = m.tipo.startsWith('mat_') ? 'maturazione' : m.tipo;
+
       const isPian = !!m.pianificato && (m.tipo === 'ferie' || m.tipo === 'ferie_az' || m.tipo === 'rol' || m.tipo === 'conto');
       const pianTxt = isPian ? ' <span style="color:#8E8E93; font-weight:700;">(P)</span>' : '';
-
-      const badgeClass = m.tipo.startsWith('mat_') ? 'maturazione' : m.tipo;
 
       return `<tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
         <td style="padding:12px;">${toITDate(m.data)}</td>
@@ -412,7 +414,7 @@ function toggleSheet(s) {
    CONSOLIDA / AZZERA
    ========================= */
 function azzeraGoduti() {
-  if (!confirm("Consolidare il saldo attuale al 01/01?")) return;
+  if (!confirm('Consolidare il saldo attuale al 01/01?')) return;
 
   let s = getSettings();
   const mov = getMovimenti();
@@ -426,7 +428,7 @@ function azzeraGoduti() {
         const o = Number(m.ore) || 0;
         if (m.tipo === 'mat_' + cat) mat += o;
         else if (m.tipo === cat || (cat === 'ferie' && m.tipo === 'ferie_az')) {
-          // consolido solo i GODUTI (non i pianificati)
+          // consolido solo i GODUTI (non pianificati)
           if (!m.pianificato) god += o;
         }
       }
@@ -436,7 +438,7 @@ function azzeraGoduti() {
     s.spettanteAnnuo[cat] = (cat === 'conto') ? 0 : (cat === 'ferie' ? 216 : 62);
   });
 
-  s.dataInizioConteggio = new Date().getFullYear() + "-01-01";
+  s.dataInizioConteggio = new Date().getFullYear() + '-01-01';
   localStorage.setItem('userSettings', JSON.stringify(s));
   location.reload();
 }
@@ -448,22 +450,23 @@ function saveData() {
   let t = document.getElementById('in-tipo')?.value;
   let o = parseFloat(document.getElementById('in-ore')?.value);
   const d = document.getElementById('in-data')?.value;
-  const note = document.getElementById('in-note') ? (document.getElementById('in-note').value || "") : "";
+  const note = document.getElementById('in-note') ? (document.getElementById('in-note').value || '') : '';
 
   const pianFlag = document.getElementById('soloPianificato')?.checked || false;
 
-  if (!d) return alert("Data mancante");
-  if (!t) return alert("Tipo mancante");
+  if (!d) return alert('Data mancante');
+  if (!t) return alert('Tipo mancante');
 
   if (t === 'maturazione') {
-    const res = prompt("Destinazione? (ferie, rol, conto)");
+    const res = prompt('Destinazione? (ferie, rol, conto)');
     if (['ferie', 'rol', 'conto'].includes(res)) t = 'mat_' + res;
     else return;
   }
 
+  // Validazione ore: AVIS può essere 0, gli altri > 0
   const oreRichieste = (t !== 'avis');
   if (oreRichieste) {
-    if (!Number.isFinite(o) || o <= 0) return alert("Inserisci un numero di ore > 0");
+    if (!Number.isFinite(o) || o <= 0) return alert('Inserisci un numero di ore > 0');
   } else {
     if (!Number.isFinite(o)) o = 0;
   }
@@ -484,7 +487,7 @@ function gestisciAutoOre() {
 
   if (t === 'malattia' || t === 'ferie_az') i.value = 8;
   else if (t === 'avis') i.value = 0;
-  else i.value = "";
+  else i.value = '';
 }
 
 /* =========================
@@ -518,9 +521,7 @@ function toggleSettings() {
       </div>`;
     });
 
-    c.innerHTML += `<button onclick="azzeraGoduti()" style="width:100%; background:#FF3B30; color:white; border:none; padding:12px; border-radius:8px; font-weight:700; margin-top:10px;">
-      CONSOLIDA E AZZERA
-    </button>`;
+    c.innerHTML += `<button onclick="azzeraGoduti()" style="width:100%; background:#FF3B30; color:white; border:none; padding:12px; border-radius:8px; font-weight:700; margin-top:10px;">CONSOLIDA E AZZERA</button>`;
   }
 }
 
@@ -538,7 +539,7 @@ function saveSettings() {
    AZIONI RECORD
    ========================= */
 function elimina(id) {
-  if (!confirm("Eliminare?")) return;
+  if (!confirm('Eliminare?')) return;
   const m = getMovimenti();
   setMovimenti(m.filter(x => x.id !== id));
   location.reload();
@@ -547,71 +548,68 @@ function elimina(id) {
 function info(id) {
   const m = getMovimenti();
   const r = m.find(x => x.id === id);
-  if (!r) return alert("Record non trovato");
+  if (!r) return alert('Record non trovato');
 
   let label = r.tipo.replace('mat_', 'MAT. ').toUpperCase();
-  if (r.tipo === 'ferie_az') label = "FERIE AZ.";
-  if (r.tipo === 'malattia') label = "MALATTIA";
-  if (r.tipo === 'avis') label = "AVIS";
+  if (r.tipo === 'ferie_az') label = 'FERIE AZ.';
+  if (r.tipo === 'malattia') label = 'MALATTIA';
+  if (r.tipo === 'avis') label = 'AVIS';
 
   const ore = Number(r.ore) || 0;
   const oreTxt = (r.tipo === 'avis') ? '-' : ore.toFixed(2) + 'h';
-  const pian = r.pianificato ? "Sì" : "No";
-  const note = (r.note || "").trim();
+  const pian = r.pianificato ? 'Sì' : 'No';
+  const note = (r.note || '').trim();
 
   alert(
     `Data: ${toITDate(r.data)}\n` +
     `Tipo: ${label}\n` +
     `Ore: ${oreTxt}\n` +
-    ((r.tipo !== 'malattia' && !r.tipo.startsWith('mat_') && r.tipo !== 'avis') ? `Pianificato: ${pian}\n` : "") +
-    (note ? `Note: ${note}` : "")
+    ((r.tipo !== 'malattia' && !r.tipo.startsWith('mat_') && r.tipo !== 'avis') ? `Pianificato: ${pian}\n` : '') +
+    (note ? `Note: ${note}` : '')
   );
 }
 
 function modifica(id) {
   const mov = getMovimenti();
   const idx = mov.findIndex(x => x.id === id);
-  if (idx < 0) return alert("Record non trovato");
+  if (idx < 0) return alert('Record non trovato');
 
   const r = mov[idx];
 
-  const data = prompt("Data (YYYY-MM-DD):", r.data);
+  const data = prompt('Data (YYYY-MM-DD):', r.data);
   if (data === null) return;
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return alert("Formato data non valido (usa YYYY-MM-DD)");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return alert('Formato data non valido (usa YYYY-MM-DD)');
 
-  let tipo = prompt(
-    "Tipo (ferie, ferie_az, rol, conto, avis, malattia, mat_ferie, mat_rol, mat_conto):",
-    r.tipo
-  );
+  let tipo = prompt('Tipo (ferie, ferie_az, rol, conto, avis, malattia, mat_ferie, mat_rol, mat_conto):', r.tipo);
   if (tipo === null) return;
-  tipo = (tipo || "").trim();
+  tipo = (tipo || '').trim();
 
   const tipiValidi = new Set(['ferie','ferie_az','rol','conto','avis','malattia','mat_ferie','mat_rol','mat_conto']);
-  if (!tipiValidi.has(tipo)) return alert("Tipo non valido");
+  if (!tipiValidi.has(tipo)) return alert('Tipo non valido');
 
   // ore default coerenti
   let oreDefault = Number(r.ore) || 0;
   if (tipo === 'malattia' || tipo === 'ferie_az') oreDefault = 8;
   if (tipo === 'avis') oreDefault = 0;
 
-  let oreStr = prompt("Ore:", String(oreDefault).replace('.', ','));
+  let oreStr = prompt('Ore:', String(oreDefault).replace('.', ','));
   if (oreStr === null) return;
   oreStr = oreStr.replace(',', '.');
   let ore = parseFloat(oreStr);
   if (!Number.isFinite(ore)) ore = 0;
 
   if (tipo !== 'avis') {
-    if (!Number.isFinite(ore) || ore <= 0) return alert("Inserisci un numero di ore > 0");
+    if (!Number.isFinite(ore) || ore <= 0) return alert('Inserisci un numero di ore > 0');
   }
 
-  const note = prompt("Note (opzionale):", r.note || "");
+  const note = prompt('Note (opzionale):', r.note || '');
   if (note === null) return;
 
   // Pianificato (solo per ferie/rol/conto/ferie_az)
   let pianificato = !!r.pianificato;
   const canHavePian = (tipo === 'ferie' || tipo === 'ferie_az' || tipo === 'rol' || tipo === 'conto');
   if (canHavePian) {
-    const resp = prompt("Solo Pianificato? (S/N)", pianificato ? "S" : "N");
+    const resp = prompt('Solo Pianificato? (S/N)', pianificato ? 'S' : 'N');
     if (resp === null) return;
     pianificato = String(resp).trim().toUpperCase().startsWith('S');
   } else {
