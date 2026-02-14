@@ -3,98 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Ferie e ROL - iWork 2026</title>
+    <title>iWork - Storico</title>
     <link rel="stylesheet" href="style.css">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body data-page="ferie">
-
-    <header class="ios-navbar">
-        <div class="nav-content"><span class="nav-brand">iWork 2026</span></div>
-    </header>
-
+    <header class="ios-navbar"><div class="nav-content"><span class="nav-brand">Storico</span></div></header>
     <main class="main-content">
         <header class="dashboard-header">
             <p class="date-subtitle">Riepilogo Residui</p>
             <h1 class="large-title">Ferie e ROL</h1>
         </header>
-
         <section class="ios-card-grid">
             <div class="ios-card" style="border-left: 4px solid var(--blue);">
                 <span class="card-label" style="color:var(--blue)">Ferie (gg)</span>
-                <div class="value" id="val-ferie">--</div>
-                <div class="card-detail">Prev: <span id="ferie-pian">--</span> gg</div>
+                <span class="value" id="val-ferie">--</span>
             </div>
             <div class="ios-card" style="border-left: 4px solid var(--orange);">
                 <span class="card-label" style="color:var(--orange)">Permessi (gg)</span>
-                <div class="value" id="val-rol">--</div>
-                <div class="card-detail">Prev: <span id="rol-pian">--</span> gg</div>
+                <span class="value" id="val-rol">--</span>
             </div>
         </section>
-
-        <div style="display: flex; gap: 10px; padding: 0 16px 15px;">
-            <div style="flex: 2; background: #E5E5EA; padding: 8px 12px; border-radius: 8px; font-size: 15px; color: black; font-weight: 500;">Tutte</div>
-            <div style="flex: 1; background: #E5E5EA; padding: 8px 12px; border-radius: 8px; font-size: 15px; color: black; text-align: center; font-weight: 500;">2026</div>
+        <div class="filter-bar" style="padding:16px; display:flex; gap:8px;">
+            <select id="filter-tipo" class="ios-select" onchange="renderizzaTabella('ferie')" style="flex:1.5;">
+                <option value="all">Tutte</option>
+                <option value="ferie">Ferie (Tutte)</option>
+                <option value="rol">Permessi</option>
+                <option value="conto">Perm.B.Ore</option>
+                <option value="maturazione">Maturazioni</option>
+            </select>
+            <select id="filter-anno" class="ios-select" onchange="renderizzaTabella('ferie')" style="flex:1;">
+                <option value="all">Anno</option>
+            </select>
         </div>
-
-        <div id="lista-ferie" class="ios-input-group">
-            </div>
+        <div class="ios-card" style="margin:0 16px; padding:0; overflow:hidden;">
+            <table style="width:100%; border-collapse:collapse;"><tbody id="history-body"></tbody></table>
+        </div>
     </main>
-
     <nav class="tab-bar">
-        <a href="index.html" class="tab-item">
-            <span class="tab-icon">🏠</span>
-            <span class="tab-label">Home</span>
-        </a>
-        <a href="ferie.html" class="tab-item active">
-            <span class="tab-icon">📅</span>
-            <span class="tab-label">Ferie</span>
-        </a>
-        <a href="malattia.html" class="tab-item">
-            <span class="tab-icon">🛌</span>
-            <span class="tab-label">Salute</span>
-        </a>
-        <a href="calendario.html" class="tab-item">
-            <span class="tab-icon">🗓️</span>
-            <span class="tab-label">Cal</span>
-        </a>
+        <a href="index.html" class="tab-item">🏠<span>Home</span></a>
+        <a href="ferie.html" class="tab-item active">📅<span>Ferie</span></a>
+        <a href="malattia.html" class="tab-item">🤒<span>Malattia</span></a>
+        <a href="calendario.html" class="tab-item">🗓️<span>Calendario</span></a>
     </nav>
-
-    <div id="modal-overlay" class="modal-backdrop" onclick="toggleModal(false)"></div>
-    <div id="add-modal" class="ios-page-sheet">
-        <div class="modal-nav">
-            <button onclick="toggleModal(false)" class="btn-link">Annulla</button>
-            <span class="nav-brand" style="color:black">Modifica Record</span>
-            <button onclick="saveData()" class="btn-link" style="font-weight:600">Salva</button>
-        </div>
-        <div class="modal-scroll-area">
-            <div class="ios-input-group">
-                <div class="ios-input-row">
-                    <label>Tipo</label>
-                    <select id="in-tipo">
-                        <option value="ferie">Ferie Individuali</option>
-                        <option value="ferie_az">Ferie Aziendali</option>
-                        <option value="rol">ROL</option>
-                        <option value="conto">Banca Ore</option>
-                    </select>
-                </div>
-                <div class="ios-input-row">
-                    <label>Ore</label>
-                    <input type="number" id="in-ore" step="0.5">
-                </div>
-                <div class="ios-input-row">
-                    <label>Data</label>
-                    <input type="date" id="in-data">
-                </div>
-                <div class="ios-input-row" style="justify-content: space-between;">
-                    <label>Pianificato</label>
-                    <input type="checkbox" id="in-pianificato" style="width:22px; height:22px;">
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script src="app.js"></script>
 </body>
 </html>
