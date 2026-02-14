@@ -1,7 +1,7 @@
 // Service Worker - iWork
 // Obiettivo: aggiornamenti più affidabili su iPhone/PWA + cache versionata
 
-const CACHE_VERSION = 'v6'; // <-- incrementa (v7, v8, ...) quando fai deploy
+const CACHE_VERSION = 'v7'; // <-- incrementa (v7, v8, ...) quando fai deploy
 const CACHE_NAME = `iwork-${CACHE_VERSION}`;
 
 // Usa percorsi RELATIVI (importante su GitHub Pages / sottocartelle)
@@ -15,7 +15,6 @@ const CORE_ASSETS = [
   './app.js',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png',
 ];
 
 // INSTALL: precache + attiva più in fretta
