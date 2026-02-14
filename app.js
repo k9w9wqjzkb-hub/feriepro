@@ -150,7 +150,7 @@ function renderizzaCalendario() {
   tableBody.innerHTML = '';
 
   const sumOre = (arr) => arr.reduce((acc, x) => acc + (Number(x.ore) || 0), 0);
-  const hasPian = (arr) => arr.some(x => !!x.pianificato);
+  const hasPian = (arr) => arr.some(x => !!(x.pianificato || x.soloPianificato)); // retrocompat
 
   mesi.forEach((mese, indexMese) => {
     let riga = `<tr><td class="col-mese">${mese}</td>`;
@@ -275,6 +275,9 @@ function aggiornaInterfaccia(page) {
 
     const ore = Number(m.ore) || 0;
 
+    // retrocompat: vecchio campo
+    const pianFlag = !!(m.pianificato || m.soloPianificato);
+
     if (m.tipo === 'malattia') {
       calcoli.malattia += ore;
       return;
@@ -291,7 +294,7 @@ function aggiornaInterfaccia(page) {
     const tipoReale = (m.tipo === 'ferie_az') ? 'ferie' : m.tipo;
     if (!calcoli[tipoReale]) return;
 
-    if (m.pianificato) calcoli[tipoReale].pian += ore;
+    if (pianFlag) calcoli[tipoReale].pian += ore;
     else calcoli[tipoReale].god += ore;
   });
 
@@ -305,20 +308,20 @@ function aggiornaInterfaccia(page) {
   const setCardPian = (id, ore) => {
     const el = document.getElementById(id);
     if (!el) return;
-    el.innerText = (ore > 0) ? ("Pian: " + fmtGG(ore)) : "";
+    // PICCOLO = FUTURO / PROGRAMMATO
+    el.innerText = (ore > 0) ? ("Prog: " + fmtGG(ore)) : "";
   };
+
   // ✅ NUMERO GRANDE = EFFETTIVI (saldo reale: AP + SPET − GOD)
   const saldoFerie = (calcoli.ferie.ap + calcoli.ferie.spet - calcoli.ferie.god);
   const saldoRol   = (calcoli.rol.ap + calcoli.rol.spet - calcoli.rol.god);
   const saldoConto = (calcoli.conto.ap + calcoli.conto.spet - calcoli.conto.god);
 
-
   setCard('val-ferie', saldoFerie);
   setCard('val-rol', saldoRol);
   setCard('val-conto', saldoConto);
 
-
-  // Pianificato (se presenti gli elementi)
+  // Pianificato / Programmato (piccolo)
   setCardPian('val-ferie-pian', calcoli.ferie.pian);
   setCardPian('val-rol-pian', calcoli.rol.pian);
   setCardPian('val-conto-pian', calcoli.conto.pian);
@@ -380,7 +383,8 @@ function renderizzaTabella(page) {
 
       const badgeClass = m.tipo.startsWith('mat_') ? 'maturazione' : m.tipo;
 
-      const isPian = !!m.pianificato && (m.tipo === 'ferie' || m.tipo === 'ferie_az' || m.tipo === 'rol' || m.tipo === 'conto');
+      const pianFlag = !!(m.pianificato || m.soloPianificato);
+      const isPian = pianFlag && (m.tipo === 'ferie' || m.tipo === 'ferie_az' || m.tipo === 'rol' || m.tipo === 'conto');
       const pianTxt = isPian ? ' <span style="color:#8E8E93; font-weight:700;">(P)</span>' : '';
 
       return `<tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
@@ -406,6 +410,12 @@ function toggleModal(s) {
   document.getElementById('add-modal')?.classList.toggle('active', !!s);
   const o = document.getElementById('modal-overlay');
   if (o) o.style.display = s ? 'block' : 'none';
+
+  // reset del toggle quando apro la modale (se esiste in index.html)
+  if (s) {
+    const cb = document.getElementById('soloPianificato');
+    if (cb) cb.checked = false;
+  }
 }
 
 function toggleSheet(s) {
@@ -431,10 +441,11 @@ function azzeraGoduti() {
     mov.forEach(m => {
       if (new Date(m.data) >= dInizio) {
         const o = Number(m.ore) || 0;
+        const pianFlag = !!(m.pianificato || m.soloPianificato);
         if (m.tipo === 'mat_' + cat) mat += o;
         else if (m.tipo === cat || (cat === 'ferie' && m.tipo === 'ferie_az')) {
           // consolido solo i GODUTI (non pianificati)
-          if (!m.pianificato) god += o;
+          if (!pianFlag) god += o;
         }
       }
     });
@@ -562,7 +573,7 @@ function info(id) {
 
   const ore = Number(r.ore) || 0;
   const oreTxt = (r.tipo === 'avis') ? '-' : ore.toFixed(2) + 'h';
-  const pian = r.pianificato ? 'Sì' : 'No';
+  const pian = (r.pianificato || r.soloPianificato) ? 'Sì' : 'No';
   const note = (r.note || '').trim();
 
   alert(
@@ -615,7 +626,6 @@ function modifica(id) {
   if (tipo !== 'avis') {
     if (!Number.isFinite(ore) || ore <= 0) return alert('Inserisci un numero di ore > 0');
   } else {
-    // per AVIS accettiamo anche 0
     if (!Number.isFinite(ore) || ore < 0) return alert('Inserisci un numero di ore valido (>= 0)');
   }
 
@@ -635,8 +645,7 @@ function modifica(id) {
   }
 
   mov[idx] = { ...r, data, tipo, ore, note, pianificato };
-  // pulizia retrocompatibilità (se esiste)
-  delete mov[idx].soloPianificato;
+  delete mov[idx].soloPianificato; // pulizia retrocompat
 
   setMovimenti(mov);
   location.reload();
