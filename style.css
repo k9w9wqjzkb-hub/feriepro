@@ -41,7 +41,14 @@ body {
 .value { font-size: 22px; font-weight: 700; }
 
 /* INPUT E FORM */
-.ios-input-group { background: white; border-radius: 12px; margin: 0 0 20px 0; border: 0.5px solid #DDD; overflow: hidden; }
+.ios-input-group {
+    background: white;
+    border-radius: 12px;
+    margin: 0 0 20px 0;
+    border: 1px solid var(--line);
+    overflow: visible; /* 🔥 era hidden → tagliava il toggle */
+}
+
 .ios-input-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid #EEE; }
 .ios-input-row label { font-size: 17px; color: #000; }
 .ios-input-row input, .ios-input-row select {
@@ -184,218 +191,114 @@ body {
 .box-blue { background: #ff4800; }
 .box-grey { background: #d7d7da; }
 
-/* =========================
-   SUBVALUE (Prev / Pianificato)
-   ========================= */
+/* Subvalue sotto le card (Prev / Prog) */
 .subvalue{
-  font-size: 12px;
+  font-size:12px;
   color:#8E8E93;
-  margin-top:6px;
-  font-weight:650;
+  margin-top:4px;
+  font-weight:600;
 }
 
-/* =========================
-   AZIONI TABELLA (✏️ ℹ️ 🗑)
-   ========================= */
-.azioni-cell { text-align: right; padding-right: 10px; white-space: nowrap; }
-.azioni-wrap { display: inline-flex; align-items: center; gap: 10px; }
-.btn-azione{
-  border:none;
-  background:none;
-  font-size:18px;
-  line-height:1;
-  padding:6px 4px;
-  cursor:pointer;
-}
-.btn-azione:active{ transform: scale(0.92); }
-
-/* =========================
-   CALENDARIO - CLASSI COLORE
-   ========================= */
+/* === CALENDARIO: colori coerenti con app.js === */
 .bg-weekend{ background-color:#D1D1D6 !important; }
-.bg-festivo{ background-color: var(--red) !important; color:#fff !important; }
-.bg-ferie-az{ background-color: var(--orange) !important; color:#fff !important; font-weight:700; }
-.bg-ferie{ background-color: var(--green) !important; color:#fff !important; font-weight:700; }
-.bg-rol{ background-color: #FFD60A !important; color:#000 !important; font-weight:700; } /* giallo */
-.bg-conto{ background-color: #34C759 !important; color:#fff !important; opacity:0.9; } /* verde pieno (conto ore) */
-.bg-malattia{ background-color:#5D4037 !important; color:#fff !important; font-weight:700; } /* marrone */
-.bg-avis{ background-color: var(--blue) !important; color:#fff !important; font-weight:700; } /* blu */
+.bg-festivo{ background-color: var(--red) !important; color:#fff !important; font-weight:800; }
+.bg-ferie-az{ background-color: var(--orange) !important; color:#fff !important; font-weight:800; }
+.bg-ferie{ background-color: var(--green) !important; color:#fff !important; font-weight:800; }
+.bg-rol{ background-color: #FFD60A !important; color:#000 !important; font-weight:800; }
+.bg-conto{ background-color: #34C759 !important; color:#fff !important; font-weight:800; }
+.bg-malattia{ background-color: #5D4037 !important; color:#fff !important; font-weight:800; }
+.bg-avis{ background-color: var(--blue) !important; color:#fff !important; font-weight:800; }
 
+/* Evidenzia celle SOLO PIANIFICATO nel calendario */
 .is-pian{
-  outline: 2px dashed rgba(0,0,0,0.35);
+  outline: 2px dashed rgba(0,0,0,0.55);
   outline-offset: -3px;
+  position: relative;
 }
-
-/* Griglia calendario più evidente */
-.calendar-table th, .calendar-table td{
-  border: 1px solid rgba(0,0,0,0.08) !important;
-}
-
-/* =========================
-   LIQUID GLASS TAB BAR (Dribbble-like)
-   ========================= */
-body{
-  /* più spazio per tab bar floating */
-  padding-bottom: calc(130px + env(safe-area-inset-bottom));
-}
-
-.tab-bar.tab-liquid{
-  position: fixed;
-  left: 14px;
-  right: 14px;
-  bottom: calc(10px + env(safe-area-inset-bottom));
-  height: 78px;
-  padding: 10px 12px;
-  border-radius: 26px;
-
-  background: rgba(255,255,255,0.14);
-  backdrop-filter: blur(22px) saturate(1.6);
-  -webkit-backdrop-filter: blur(22px) saturate(1.6);
-
-  border: 1px solid rgba(255,255,255,0.22);
-  box-shadow:
-    0 18px 40px rgba(0,0,0,0.22),
-    inset 0 1px 0 rgba(255,255,255,0.28);
-
-  display:flex;
-  align-items:center;
-  justify-content: space-between;
-  z-index: 100;
-}
-
-.tab-bar.tab-liquid::before{
-  content:"";
-  position:absolute;
-  inset:-18px;
-  border-radius: 34px;
-  pointer-events:none;
-  filter: blur(18px);
-  opacity: 0.85;
-  background:
-    radial-gradient(110px 70px at 18% 40%, rgba(235,16,148,0.55), transparent 60%),
-    radial-gradient(120px 80px at 82% 55%, rgba(56,10,225,0.55), transparent 60%),
-    radial-gradient(120px 80px at 60% 12%, rgba(214,35,80,0.45), transparent 60%);
-}
-
-.tab-bar.tab-liquid::after{
+.is-pian::after{
   content:"";
   position:absolute;
   inset:0;
-  border-radius: 26px;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255,255,255,0.00),
+    rgba(255,255,255,0.00) 6px,
+    rgba(255,255,255,0.18) 6px,
+    rgba(255,255,255,0.18) 10px
+  );
   pointer-events:none;
-  background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.02) 55%, rgba(0,0,0,0.06));
-  mix-blend-mode: overlay;
 }
 
-.tab-bar.tab-liquid .liquid-indicator{
-  position:absolute;
-  height:54px;
-  width:25%;
-  border-radius:18px;
-  background: rgba(255,255,255,0.20);
-  border: 1px solid rgba(255,255,255,0.28);
-  box-shadow:
-    0 10px 25px rgba(0,0,0,0.25),
-    inset 0 1px 0 rgba(255,255,255,0.35);
-  transition: transform 0.45s cubic-bezier(.34,1.56,.64,1), width .25s ease;
-  top:50%;
-  transform: translateY(-50%) translateX(0);
-  pointer-events:none;
-  z-index:1;
+/* Griglia calendario: linee verticali/orizzontali ben visibili */
+.calendar-table, .grid-table{
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
 }
-
-.tab-bar.tab-liquid .tab-item{
-  position: relative;
-  flex:1;
-  height:100%;
-  border-radius:18px;
-  gap:6px;
-  font-size:28px;
-  color: rgba(0,0,0,0.55);
-  justify-content:center;
-  z-index:2;
-  transition: transform .15s ease, color .15s ease;
+.calendar-table th, .calendar-table td,
+.grid-table th, .grid-table td{
+  border: 1px solid rgba(0,0,0,0.18) !important;
+  text-align: center;
+  padding: 0;
+  min-width: 28px;
+  height: 30px;
+  font-size: 11px;
 }
-
-.tab-bar.tab-liquid .tab-item span{
-  font-size:13px;
-  font-weight:650;
-  margin-top:6px;
-}
-
-.tab-bar.tab-liquid .tab-item.active{
-  color: rgba(0,0,0,0.85);
-  transform: translateY(-1px);
-}
-
-.tab-bar.tab-liquid .tab-item:active{
-  transform: scale(0.92);
+.col-mese{
+  font-weight: 700;
+  background: #F9F9F9;
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  min-width: 56px;
 }
 
 /* =========================
-   DARK MODE (auto) - tutta l'app
+   Filtri (Tipo / Anno) affiancati
    ========================= */
-@media (prefers-color-scheme: dark) {
-  :root{
-    --bg:#000000;
-    --card-bg:#1C1C1E;
-    --blue:#0A84FF;
-    --red:#FF453A;
-    --green:#30D158;
-    --orange:#FF9F0A;
-  }
-  body{ background: var(--bg); color:#fff; }
-  .ios-navbar{
-    background: rgba(28,28,30,0.85);
-    border-bottom: 0.5px solid rgba(255,255,255,0.10);
-  }
-  .nav-brand{ color: rgba(255,255,255,0.92); }
-  .date-subtitle{ color: rgba(235,235,245,0.60); }
+.filter-bar{
+  padding: 16px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;          /* niente colonna */
+  align-items: center;
+}
+.filter-bar .ios-select{
+  min-width: 0;               /* permette di restringere senza andare a capo */
+  flex: 1 1 0;
+}
+.filter-bar .ios-select:first-child{
+  flex: 1.4 1 0;              /* Tipo un po' più largo */
+}
 
-  .ios-card{ background: var(--card-bg); box-shadow: 0 2px 10px rgba(0,0,0,0.35); }
-  .ios-card-btn{ background: var(--card-bg); color: rgba(255,255,255,0.92); }
-  .subvalue{ color: rgba(235,235,245,0.60); }
+/* Se lo schermo è davvero stretto, riduciamo padding e font ma restiamo affiancati */
+@media (max-width: 360px){
+  .filter-bar{ padding: 12px; gap: 8px; }
+  .filter-bar .ios-select{ font-size: 13px; padding: 7px 10px; }
+}
+/* =========================
+   FIX TAB BAR OVERFLOW
+   ========================= */
 
-  .ios-page-sheet{ background:#1C1C1E; }
-  .modal-nav{
-    background: rgba(28,28,30,0.90);
-    border-bottom: 0.5px solid rgba(255,255,255,0.10);
-  }
-  .modal-title{ color: rgba(255,255,255,0.92); }
-  .btn-link{
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.12);
-    color: rgba(255,255,255,0.92);
-    font-size:20px;
-    font-weight:650;
-    padding:10px 16px;
-    min-width:44px;
-    min-height:44px;
-    border-radius:12px;
-  }
-  .btn-link:active{ transform: scale(0.94); background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.20); }
+.tab-bar.tab-liquid{
+  left: 10px;
+  right: 10px;          /* meno largo */
+  max-width: 500px;     /* limite massimo */
+  margin: 0 auto;       /* centrato */
+  box-sizing: border-box;
+  overflow: hidden;     /* evita uscita laterale */
+}
 
-  .ios-input-group{ background:#1C1C1E; border: 1px solid rgba(255,255,255,0.10); }
-  .ios-input-row{ border-bottom: 0.5px solid rgba(255,255,255,0.08); }
-  .ios-input-row label{ color: rgba(255,255,255,0.92); }
-  .ios-input-row input, .ios-input-row select{ color: rgba(235,235,245,0.70); }
+/* Assicuriamoci che le tab non escano */
+.tab-bar.tab-liquid .tab-item{
+  min-width: 0;
+  flex: 1 1 0;
+}
 
+/* Se ancora troppo larga su schermi piccoli */
+@media (max-width: 390px){
   .tab-bar.tab-liquid{
-    background: rgba(20,20,22,0.55);
-    border: 1px solid rgba(255,255,255,0.14);
-    box-shadow:
-      0 18px 40px rgba(0,0,0,0.55),
-      inset 0 1px 0 rgba(255,255,255,0.16);
+    left: 6px;
+    right: 6px;
   }
-  .tab-bar.tab-liquid .tab-item{ color: rgba(235,235,245,0.72); }
-  .tab-bar.tab-liquid .tab-item span{ color: rgba(235,235,245,0.70); }
-  .tab-bar.tab-liquid .tab-item.active{ color: rgba(255,255,255,0.95); }
-
-  .calendar-wrapper{ background:#1C1C1E; border: 1px solid rgba(255,255,255,0.10); }
-  .calendar-table th, .calendar-table td{ border: 1px solid rgba(255,255,255,0.10) !important; }
-  .calendar-table th{ background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.92); }
-  .calendar-table td:first-child{ background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.92); }
-
-  .bg-weekend{ background-color: rgba(255,255,255,0.10) !important; }
-  .is-pian{ outline-color: rgba(255,255,255,0.55); }
 }
