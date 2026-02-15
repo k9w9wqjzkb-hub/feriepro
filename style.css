@@ -41,14 +41,7 @@ body {
 .value { font-size: 22px; font-weight: 700; }
 
 /* INPUT E FORM */
-.ios-input-group {
-    background: white;
-    border-radius: 12px;
-    margin: 0 0 20px 0;
-    border: 1px solid var(--line);
-    overflow: visible; /* 🔥 era hidden → tagliava il toggle */
-}
-
+.ios-input-group { background: white; border-radius: 12px; margin: 0 0 20px 0; border: 0.5px solid #DDD; overflow: hidden; }
 .ios-input-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid #EEE; }
 .ios-input-row label { font-size: 17px; color: #000; }
 .ios-input-row input, .ios-input-row select {
@@ -191,64 +184,101 @@ body {
 .box-blue { background: #ff4800; }
 .box-grey { background: #d7d7da; }
 
-/* Subvalue sotto le card (Prev / Prog) */
+
+/* =========================
+   PATCH UI (Prev / Pianificato / Azioni / Calendario)
+   ========================= */
+
+/* subvalue sotto al valore grande nelle card */
 .subvalue{
-  font-size:12px;
-  color:#8E8E93;
-  margin-top:4px;
-  font-weight:600;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #8E8E93;
 }
 
-/* === CALENDARIO: colori coerenti con app.js === */
-.bg-weekend{ background-color:#D1D1D6 !important; }
-.bg-festivo{ background-color: var(--red) !important; color:#fff !important; font-weight:800; }
-.bg-ferie-az{ background-color: var(--orange) !important; color:#fff !important; font-weight:800; }
-.bg-ferie{ background-color: var(--green) !important; color:#fff !important; font-weight:800; }
-.bg-rol{ background-color: #FFD60A !important; color:#000 !important; font-weight:800; }
-.bg-conto{ background-color: #34C759 !important; color:#fff !important; font-weight:800; }
-.bg-malattia{ background-color: #5D4037 !important; color:#fff !important; font-weight:800; }
-.bg-avis{ background-color: var(--blue) !important; color:#fff !important; font-weight:800; }
-
-/* Evidenzia celle SOLO PIANIFICATO nel calendario */
-.is-pian{
-  outline: 2px dashed rgba(0,0,0,0.55);
-  outline-offset: -3px;
-  position: relative;
-}
-.is-pian::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(255,255,255,0.00),
-    rgba(255,255,255,0.00) 6px,
-    rgba(255,255,255,0.18) 6px,
-    rgba(255,255,255,0.18) 10px
-  );
-  pointer-events:none;
+/* evitare che il toggle venga "tagliato" */
+.ios-input-group{
+  overflow: visible !important;
 }
 
-/* Griglia calendario: linee verticali/orizzontali ben visibili */
-.calendar-table, .grid-table{
-  border-collapse: collapse;
+/* riga checkbox "Solo Pianificato" */
+.checkbox-row{
+  padding: 12px 16px;
+  border-top: 0.5px solid #EEE;
+  background: #fff;
+}
+.checkbox-container{
   width: 100%;
-  table-layout: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 17px;
+  color: #000;
 }
-.calendar-table th, .calendar-table td,
-.grid-table th, .grid-table td{
-  border: 1px solid rgba(0,0,0,0.18) !important;
-  text-align: center;
-  padding: 0;
-  min-width: 28px;
-  height: 30px;
-  font-size: 11px;
+.checkbox-container input[type="checkbox"]{
+  width: 44px;
+  height: 28px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #E5E5EA;
+  border-radius: 14px;
+  position: relative;
+  outline: none;
+  cursor: pointer;
+  transition: background .15s ease;
 }
-.col-mese{
-  font-weight: 700;
-  background: #F9F9F9;
-  position: sticky;
-  left: 0;
-  z-index: 5;
-  min-width: 56px;
+.checkbox-container input[type="checkbox"]::after{
+  content:"";
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border-radius: 12px;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.25);
+  transition: transform .15s ease;
+}
+.checkbox-container input[type="checkbox"]:checked{
+  background: var(--green);
+}
+.checkbox-container input[type="checkbox"]:checked::after{
+  transform: translateX(16px);
+}
+
+/* azioni tabella (✏️ ℹ️ 🗑) */
+.azioni-cell { text-align: right; padding-right: 10px; white-space: nowrap; }
+.azioni-wrap { display: inline-flex; align-items: center; gap: 10px; }
+.btn-azione{
+  border: none;
+  background: none;
+  font-size: 18px;
+  line-height: 1;
+  padding: 6px 4px;
+  cursor: pointer;
+}
+.btn-azione:active { transform: scale(0.92); }
+
+/* =========================
+   Calendario: colori + griglia
+   ========================= */
+.calendar-table th, .calendar-table td{
+  border: 0.5px solid rgba(0,0,0,0.12) !important; /* griglia visibile */
+}
+
+.bg-empty{ background:#F2F2F7 !important; }
+.bg-weekend{ background:#D1D1D6 !important; color:#000; }          /* grigio */
+.bg-festivo{ background: var(--red) !important; color:#fff; }      /* rosso */
+.bg-ferie-az{ background: var(--orange) !important; color:#fff; }  /* arancio */
+.bg-ferie{ background: var(--green) !important; color:#fff; }      /* verde */
+.bg-rol{ background:#FFCC00 !important; color:#000; font-weight:700; } /* giallo */
+.bg-conto{ background: var(--blue) !important; color:#fff; }       /* blu */
+.bg-malattia{ background:#5D4037 !important; color:#fff; }         /* marrone */
+.bg-avis{ background: var(--blue) !important; color:#fff; }        /* blu */
+
+/* Pianificato: bordo tratteggiato */
+.is-pian{
+  outline: 2px dashed rgba(0,0,0,0.35);
+  outline-offset: -3px;
 }
