@@ -1,32 +1,51 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iWork - Calendario Orizzontale</title>
-    <link rel="stylesheet" href="style.css">
-    
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>iWork - Calendario</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body data-page="calendario">
-    <main class="main-content">
-        <div class="calendar-wrapper">
-            <table class="calendar-table">
-                <thead>
-                    <tr id="calendarHeader"></tr>
-                </thead>
-                <tbody id="calendarBody"></tbody>
-            </table>
-        </div>
-    </main>
+  <header class="ios-navbar">
+    <div class="nav-content"><span class="nav-brand">Calendario</span></div>
+  </header>
 
-    <nav class="tab-bar">
-        <a href="index.html" class="tab-item">🏠<span>Home</span></a>
-        <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
-        <a href="malattia.html" class="tab-item">🤒<span>Mal</span></a>
-        <a href="calendario.html" class="tab-item active">🗓️<span>Cal</span></a>
-        
-    </nav>
+  <main class="main-content">
+    <header class="dashboard-header">
+      <p class="date-subtitle">Anno corrente</p>
+      <h1 class="large-title">Calendario</h1>
+    </header>
 
-    <script src="app.js"></script>
+    <div class="calendar-wrapper">
+      <table class="calendar-table">
+        <thead>
+          <tr id="calendarHeader"></tr>
+        </thead>
+        <tbody id="calendarBody"></tbody>
+      </table>
+    </div>
+
+    <div class="legend-container">
+      <div class="legend-item"><i class="bg-festivo"></i>Festività</div>
+      <div class="legend-item"><i class="bg-ferie-az"></i>Ferie Aziendali</div>
+      <div class="legend-item"><i class="bg-ferie"></i>Ferie Personali</div>
+      <div class="legend-item"><i class="bg-rol"></i>ROL</div>
+      <div class="legend-item"><i class="bg-malattia"></i>Malattia</div>
+      <div class="legend-item"><i class="bg-avis"></i>AVIS</div>
+      <div class="legend-item"><i class="bg-weekend"></i>Weekend</div>
+      <div class="legend-item"><i class="is-pian" style="background:transparent; border-radius:3px;"></i>Pianificato</div>
+    </div>
+  </main>
+
+  <nav class="tab-bar tab-liquid">
+    <div class="liquid-indicator"></div>
+    <a href="index.html" class="tab-item">🏠<span>Home</span></a>
+    <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
+    <a href="malattia.html" class="tab-item">🤒<span>Malattia</span></a>
+    <a href="calendario.html" class="tab-item active">🗓️<span>Calendario</span></a>
+  </nav>
+
+  <script src="app.js"></script>
 </body>
 </html>
