@@ -1,11 +1,9 @@
-// Service Worker - iWork
-// Obiettivo: aggiornamenti più affidabili su iPhone/PWA + cache versionata
+// Service Worker iWork (GitHub Pages friendly)
+// Cambia CACHE_NAME ad ogni release per forzare update su iPhone
+const CACHE_NAME = 'iwork-v6';
 
-const CACHE_VERSION = 'v7'; // <-- incrementa (v7, v8, ...) quando fai deploy
-const CACHE_NAME = `iwork-${CACHE_VERSION}`;
-
-// Usa percorsi RELATIVI (importante su GitHub Pages / sottocartelle)
-const CORE_ASSETS = [
+// Percorsi RELATIVI (così funzionano anche su /<repo>/)
+const ASSETS = [
   './',
   './index.html',
   './ferie.html',
@@ -15,70 +13,50 @@ const CORE_ASSETS = [
   './app.js',
   './manifest.json',
   './icon-192.png',
+  './icon-512.png'
 ];
 
-// INSTALL: precache + attiva più in fretta
 self.addEventListener('install', (event) => {
-  event.waitUntil((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    await cache.addAll(CORE_ASSETS);
-    await self.skipWaiting();
-  })());
+  self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+  );
 });
 
-// ACTIVATE: prendi controllo + pulizia vecchie cache
 self.addEventListener('activate', (event) => {
-  event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(
-      keys
-        .filter(k => k.startsWith('iwork-') && k !== CACHE_NAME)
-        .map(k => caches.delete(k))
-    );
-    await self.clients.claim();
-  })());
+  event.waitUntil(
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => (k !== CACHE_NAME) ? caches.delete(k) : Promise.resolve()));
+      await self.clients.claim();
+    })()
+  );
 });
 
-// Messaggio per forzare skipWaiting (opzionale)
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
-});
-
-// FETCH strategy:
-// - HTML (navigate/document): NETWORK FIRST (così gli update arrivano subito)
-// - static assets (js/css/img): STALE-WHILE-REVALIDATE
 self.addEventListener('fetch', (event) => {
   const req = event.request;
 
   // Solo GET
   if (req.method !== 'GET') return;
 
-  const isDocument = req.mode === 'navigate' || req.destination === 'document';
+  event.respondWith(
+    (async () => {
+      const cached = await caches.match(req);
+      if (cached) return cached;
 
-  if (isDocument) {
-    event.respondWith((async () => {
       try {
-        const fresh = await fetch(req, { cache: 'no-store' });
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(req, fresh.clone());
+        const fresh = await fetch(req);
+        // Cache only same-origin
+        const url = new URL(req.url);
+        if (url.origin === self.location.origin) {
+          const cache = await caches.open(CACHE_NAME);
+          cache.put(req, fresh.clone());
+        }
         return fresh;
-      } catch (err) {
-        const cached = await caches.match(req);
-        return cached || caches.match('./index.html');
+      } catch (e) {
+        // fallback: home
+        return caches.match('./index.html');
       }
-    })());
-    return;
-  }
-
-  // Asset: stale-while-revalidate
-  event.respondWith((async () => {
-    const cached = await caches.match(req);
-    const fetchPromise = fetch(req).then(async (res) => {
-      const cache = await caches.open(CACHE_NAME);
-      cache.put(req, res.clone());
-      return res;
-    }).catch(() => null);
-
-    return cached || (await fetchPromise) || Response.error();
-  })());
+    })()
+  );
 });
