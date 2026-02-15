@@ -41,7 +41,14 @@ body {
 .value { font-size: 22px; font-weight: 700; }
 
 /* INPUT E FORM */
-.ios-input-group { background: white; border-radius: 12px; margin: 0 0 20px 0; border: 0.5px solid #DDD; overflow: hidden; }
+.ios-input-group {
+    background: white;
+    border-radius: 12px;
+    margin: 0 0 20px 0;
+    border: 1px solid var(--line);
+    overflow: visible; /* 🔥 era hidden → tagliava il toggle */
+}
+
 .ios-input-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid #EEE; }
 .ios-input-row label { font-size: 17px; color: #000; }
 .ios-input-row input, .ios-input-row select {
@@ -86,7 +93,7 @@ body {
 .badge-conto { background: #E8F5E9; color: #1B5E20; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
 .badge-malattia { background: #FFEBEE; color: #B71C1C; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
 .badge-maturazione { background: #F3E5F5; color: #4A148C; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
-.badge-avis { background: #E3F2FD; color: #0D47A1; border: 1px solid #90CAF9; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; }
+.badge-avis { background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; }
 
 /* NUOVA SEZIONE: CALENDARIO ORIZZONTALE (Stile Tabella Allegata) */
 .calendar-wrapper {
@@ -183,3 +190,65 @@ body {
 .box-green { background: #d11c1c; }
 .box-blue { background: #ff4800; }
 .box-grey { background: #d7d7da; }
+
+/* Subvalue sotto le card (Prev / Prog) */
+.subvalue{
+  font-size:12px;
+  color:#8E8E93;
+  margin-top:4px;
+  font-weight:600;
+}
+
+/* === CALENDARIO: colori coerenti con app.js === */
+.bg-weekend{ background-color:#D1D1D6 !important; }
+.bg-festivo{ background-color: var(--red) !important; color:#fff !important; font-weight:800; }
+.bg-ferie-az{ background-color: var(--orange) !important; color:#fff !important; font-weight:800; }
+.bg-ferie{ background-color: var(--green) !important; color:#fff !important; font-weight:800; }
+.bg-rol{ background-color: #FFD60A !important; color:#000 !important; font-weight:800; }
+.bg-conto{ background-color: #34C759 !important; color:#fff !important; font-weight:800; }
+.bg-malattia{ background-color: #5D4037 !important; color:#fff !important; font-weight:800; }
+.bg-avis{ background-color: var(--blue) !important; color:#fff !important; font-weight:800; }
+
+/* Evidenzia celle SOLO PIANIFICATO nel calendario */
+.is-pian{
+  outline: 2px dashed rgba(0,0,0,0.55);
+  outline-offset: -3px;
+  position: relative;
+}
+.is-pian::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255,255,255,0.00),
+    rgba(255,255,255,0.00) 6px,
+    rgba(255,255,255,0.18) 6px,
+    rgba(255,255,255,0.18) 10px
+  );
+  pointer-events:none;
+}
+
+/* Griglia calendario: linee verticali/orizzontali ben visibili */
+.calendar-table, .grid-table{
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+}
+.calendar-table th, .calendar-table td,
+.grid-table th, .grid-table td{
+  border: 1px solid rgba(0,0,0,0.18) !important;
+  text-align: center;
+  padding: 0;
+  min-width: 28px;
+  height: 30px;
+  font-size: 11px;
+}
+.col-mese{
+  font-weight: 700;
+  background: #F9F9F9;
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  min-width: 56px;
+}

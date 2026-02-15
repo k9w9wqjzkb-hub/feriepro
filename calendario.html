@@ -1,45 +1,31 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>iWork - Calendario</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>iWork - Calendario Orizzontale</title>
+    <link rel="stylesheet" href="style.css">
+    </head>
 <body data-page="calendario">
-  <header class="ios-navbar">
-    <div class="nav-content"><span class="nav-brand">Calendario</span></div>
-  </header>
+    <main class="main-content">
+        <div class="calendar-wrapper">
+            <table class="calendar-table">
+                <thead>
+                    <tr id="calendarHeader"></tr>
+                </thead>
+                <tbody id="calendarBody"></tbody>
+            </table>
+        </div>
+    </main>
 
-  <main class="main-content">
-    <div class="calendar-wrapper">
-      <table class="calendar-table">
-        <thead>
-          <tr id="calendarHeader"></tr>
-        </thead>
-        <tbody id="calendarBody"></tbody>
-      </table>
-    </div>
+    <nav class="tab-bar">
+        <a href="index.html" class="tab-item">🏠<span>Home</span></a>
+        <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
+        <a href="malattia.html" class="tab-item">🤒<span>Mal</span></a>
+        <a href="calendario.html" class="tab-item active">🗓️<span>Cal</span></a>
+        
+    </nav>
 
-    <div class="legend-container">
-      <div class="legend-item"><i style="background: var(--red);"></i>Festività</div>
-      <div class="legend-item"><i style="background: var(--orange);"></i>Ferie Aziendali</div>
-      <div class="legend-item"><i style="background: var(--green);"></i>Ferie Personali</div>
-      <div class="legend-item"><i style="background: var(--yellow);"></i>ROL</div>
-      <div class="legend-item"><i style="background: var(--brown);"></i>Malattia</div>
-      <div class="legend-item"><i style="background: var(--blue);"></i>AVIS</div>
-      <div class="legend-item"><i style="background: #D1D1D6;"></i>Weekend</div>
-      <div class="legend-item"><i style="background: white; border:2px dashed rgba(0,0,0,0.55);"></i>Pianificato</div>
-    </div>
-  </main>
-
-  <nav class="tab-bar">
-    <a href="index.html" class="tab-item">🏠<span>Home</span></a>
-    <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
-    <a href="malattia.html" class="tab-item">🤒<span>Malattia</span></a>
-    <a href="calendario.html" class="tab-item active">🗓️<span>Calendario</span></a>
-  </nav>
-
-  <script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
