@@ -1,29 +1,30 @@
-// Service Worker iWork (GitHub Pages friendly)
-// v11 - cache versioned + cleanup + network-first for navigations (iOS/PWA)
+/* iWork Service Worker - v11
+   - GitHub Pages friendly (relative paths)
+   - Network-first for HTML navigations to avoid "old version" on iOS PWA
+   - Cache versioning + cleanup
+*/
 const CACHE_NAME = 'iwork-v11';
-
-// Percorsi RELATIVI (repo: /feriepro/)
-const ASSETS = [
+const CORE_ASSETS = [
   './',
-  './index.html?v=11',
-  './ferie.html?v=11',
-  './malattia.html?v=11',
-  './calendario.html?v=11',
-  './style.css?v=11',
-  './app.js?v=11',
-  './manifest.json?v=11',
+  './index.html',
+  './ferie.html',
+  './malattia.html',
+  './calendario.html',
+  './style.css',
+  './app.js',
+  './manifest.json',
   './icon-192.png',
   './icon-512.png',
   './icon-180.png',
   './icon-167.png',
   './icon-152.png',
-  './icon-120.png',
+  './icon-120.png'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    await cache.addAll(ASSETS);
+    await cache.addAll(CORE_ASSETS);
     self.skipWaiting();
   })());
 });
@@ -31,23 +32,24 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : Promise.resolve())));
+    await Promise.all(keys.map(k => (k !== CACHE_NAME) ? caches.delete(k) : Promise.resolve()));
     self.clients.claim();
   })());
 });
 
-// Helpers
-const isNavigation = (req) => req.mode === 'navigate' || (req.destination === 'document');
+function isHTMLRequest(request) {
+  return request.mode === 'navigate' ||
+    (request.headers.get('accept') || '').includes('text/html');
+}
 
 self.addEventListener('fetch', (event) => {
   const req = event.request;
-  const url = new URL(req.url);
 
-  // Only same-origin (GitHub Pages)
-  if (url.origin !== location.origin) return;
+  // Only handle GET
+  if (req.method !== 'GET') return;
 
-  // HTML / navigations: NETWORK FIRST (evita "versione vecchia" su PWA iOS)
-  if (isNavigation(req)) {
+  // HTML: network-first
+  if (isHTMLRequest(req)) {
     event.respondWith((async () => {
       try {
         const fresh = await fetch(req);
@@ -55,22 +57,22 @@ self.addEventListener('fetch', (event) => {
         cache.put(req, fresh.clone());
         return fresh;
       } catch (e) {
-        const cached = await caches.match(req);
-        return cached || caches.match('./index.html?v=11');
+        const cached = await caches.match(req, { ignoreSearch: true });
+        return cached || caches.match('./index.html');
       }
     })());
     return;
   }
 
-  // Static assets: STALE-WHILE-REVALIDATE
+  // Others: stale-while-revalidate
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);
-    const cached = await cache.match(req);
+    const cached = await cache.match(req, { ignoreSearch: true });
     const fetchPromise = fetch(req).then((fresh) => {
       cache.put(req, fresh.clone());
       return fresh;
     }).catch(() => null);
 
-    return cached || (await fetchPromise) || new Response('', { status: 504, statusText: 'Offline' });
+    return cached || (await fetchPromise) || fetch(req);
   })());
 });

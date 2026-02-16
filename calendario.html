@@ -5,17 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>iWork - Calendario Orizzontale</title>
     <link rel="stylesheet" href="style.css?v=11">
-    
-    <link rel="manifest" href="manifest.json?v=11">
-    <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
-    <link rel="apple-touch-icon" sizes="167x167" href="icon-167.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="icon-120.png">
+    <style>
+        :root {
+            --sabato: #E5E5EA;
+            --domenica: #8E8E93;
+            --festivo: #FF3B30;
+            --ferie-az: #004085;
+            --ferie: #34C759;
+            --rol: #FF9500;
+            --avis: #FFD60A;
+            --malattia: #AF52DE;
+        }
+
+        /* Forza il layout a tutto schermo */
+        .main-content { padding: 5px !important; margin: 0 !important; }
+
+        .calendar-wrapper {
+            width: 100%;
+            background: white;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .grid-table {
+            border-collapse: collapse;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        .grid-table th, .grid-table td {
+            border: 0.5px solid #bbb;
+            text-align: center;
+            padding: 0;
+            height: 5.5vh; /* Altezza dinamica basata sul display orizzontale */
+            font-size: 10px;
+        }
+
+        .col-mese { 
+            width: 50px; 
+            font-weight: 700;
+            background: #f2f2f7;
+            font-size: 10px !important;
+        }
+
+        /* Colori richiesti dall'allegato */
+        .bg-sabato { background-color: var(--sabato); }
+        .bg-domenica { background-color: var(--domenica); color: white; }
+        .bg-festivo { background-color: var(--festivo); color: white; }
+        .bg-ferie-coll { background-color: var(--ferie-az); color: white; }
+        .bg-ferie-ind { background-color: var(--ferie); color: white; }
+        .bg-malattia { background-color: var(--malattia); color: white; }
+        .bg-avis { background-color: var(--avis); color: black; }
+        .text-rol { color: var(--rol); font-weight: bold; font-size: 9px; }
+
+        /* Nascondi la tab-bar in orizzontale per guadagnare spazio */
+        @media (orientation: landscape) {
+            .tab-bar { display: none; }
+            .ios-navbar { display: none; }
+            .main-content { padding: 0 !important; }
+            .grid-table td, .grid-table th { height: 7.5vh; font-size: 11px; }
+        }
+    </style>
 </head>
 <body data-page="calendario">
     <main class="main-content">
         <div class="calendar-wrapper">
-            <table class="calendar-table">
+            <table class="grid-table">
                 <thead>
                     <tr id="calendarHeader"></tr>
                 </thead>
@@ -24,7 +79,7 @@
         </div>
     </main>
 
-    <nav class="tab-bar tab-liquid">
+    <nav class="tab-bar">
         <a href="index.html" class="tab-item">🏠<span>Home</span></a>
         <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
         <a href="malattia.html" class="tab-item">🤒<span>Mal</span></a>
