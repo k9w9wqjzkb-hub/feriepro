@@ -1,36 +1,21 @@
 {
   "short_name": "iWork",
   "name": "iWork - Gestione Ore",
-  "description": "Gestione ferie, ROL, conto ore, malattia e calendario.",
   "icons": [
     {
       "src": "icon-192.png",
       "type": "image/png",
-      "sizes": "192x192",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-192.png",
-      "type": "image/png",
-      "sizes": "192x192",
-      "purpose": "maskable"
+      "sizes": "192x192"
     },
     {
       "src": "icon-512.png",
       "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "maskable"
+      "sizes": "512x512"
     }
   ],
-  "start_url": "./index.html?v=12",
-  "scope": "./",
+  "start_url": "./index.html?v=10",
+  "background_color": "#F2F2F7",
   "display": "standalone",
-  "background_color": "#0B0B0F",
-  "theme_color": "#0B0B0F"
+  "scope": "./",
+  "theme_color": "#007AFF"
 }

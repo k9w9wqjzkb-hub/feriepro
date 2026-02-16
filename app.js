@@ -706,3 +706,39 @@ function importBackup(e) {
   };
   r.readAsText(file);
 }
+
+/* =========================
+   Liquid Tab Animation
+   - sposta l'indicatore glass sotto la tab attiva
+   ========================= */
+window.addEventListener('load', () => {
+  const bar = document.querySelector('.tab-bar.tab-liquid');
+  const indicator = document.querySelector('.tab-bar.tab-liquid .liquid-indicator');
+  const tabs = document.querySelectorAll('.tab-bar.tab-liquid .tab-item');
+  if (!bar || !indicator || tabs.length === 0) return;
+
+  function moveIndicator(activeTab) {
+    const tabRect = activeTab.getBoundingClientRect();
+    const barRect = bar.getBoundingClientRect();
+    const w = Math.max(44, tabRect.width - 12);
+    const x = (tabRect.left - barRect.left) + 6;
+    indicator.style.width = w + 'px';
+    indicator.style.transform = `translateY(-50%) translateX(${x}px)`;
+  }
+
+  const active = document.querySelector('.tab-bar.tab-liquid .tab-item.active');
+  if (active) moveIndicator(active);
+
+  tabs.forEach(t => {
+    t.addEventListener('click', () => {
+      tabs.forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      moveIndicator(t);
+    });
+  });
+
+  window.addEventListener('resize', () => {
+    const a = document.querySelector('.tab-bar.tab-liquid .tab-item.active');
+    if (a) moveIndicator(a);
+  });
+});

@@ -1,92 +1,68 @@
-// iWork PWA Service Worker (GitHub Pages safe) - v12
-const VERSION = 'iwork-v12';
-const RUNTIME = 'iwork-runtime-v12';
+// iWork Service Worker (v9)
+const CACHE_NAME = 'iwork-v10';
 
-// Files we want to precache (resolved relative to scope)
-const PRECACHE = [
+// Files to pre-cache (relative paths for GitHub Pages)
+const ASSETS = [
   './',
-  './index.html',
-  './ferie.html',
-  './malattia.html',
-  './calendario.html',
-  './style.css',
-  './app.js',
-  './manifest.json',
+  './index.html?v=10',
+  './ferie.html?v=10',
+  './malattia.html?v=10',
+  './calendario.html?v=10',
+  './style.css?v=10',
+  './app.js?v=10',
+  './manifest.json?v=10',
   './icon-192.png',
-  './icon-512.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil((async () => {
-    const cache = await caches.open(VERSION);
-    // Resolve each entry against this SW scope to work under /feriepro/
-    const urls = PRECACHE.map(u => new URL(u, self.registration.scope).toString());
-    await cache.addAll(urls);
-    self.skipWaiting();
-  })());
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(ASSETS))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(keys.map(k => {
-      if (k !== VERSION && k !== RUNTIME) return caches.delete(k);
-    }));
-    await self.clients.claim();
-  })());
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.map(k => (k !== CACHE_NAME ? caches.delete(k) : Promise.resolve())))
+    ).then(() => self.clients.claim())
+  );
 });
 
-// Allow the page to force-activate the waiting SW
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-});
-
+// Network-first for navigations, stale-while-revalidate for assets
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
-  // Only handle same-origin
+  if (req.method !== 'GET') return;
+
+  // only handle same-origin
   if (url.origin !== self.location.origin) return;
 
-  // 1) HTML navigations: Network-first (so you always see the latest UI), fallback to cache
-  if (req.mode === 'navigate' || (req.headers.get('accept') || '').includes('text/html')) {
-    event.respondWith((async () => {
-      try {
-        const fresh = await fetch(req, { cache: 'no-store' });
-        const cache = await caches.open(RUNTIME);
-        cache.put(req, fresh.clone());
-        return fresh;
-      } catch (e) {
-        // fallback to runtime cache, then precache
-        const cached = await caches.match(req);
-        if (cached) return cached;
-
-        // fallback to cached index (app shell)
-        const indexUrl = new URL('./index.html', self.registration.scope).toString();
-        const indexCached = await caches.match(indexUrl);
-        return indexCached || Response.error();
-      }
-    })());
-    return;
-  }
-
-  // 2) Static assets: Stale-while-revalidate
-  if (['style', 'script', 'image', 'font'].includes(req.destination)) {
-    event.respondWith((async () => {
-      const cached = await caches.match(req);
-      const fetchPromise = fetch(req).then(async (res) => {
-        const cache = await caches.open(RUNTIME);
-        cache.put(req, res.clone());
+  // Navigations: always try network first
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      fetch(req).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
         return res;
-      }).catch(() => null);
-
-      return cached || (await fetchPromise) || Response.error();
-    })());
+      }).catch(() => caches.match(req).then(r => r || caches.match('./')))
+    );
     return;
   }
 
-  // 3) Default: cache-first fallback
-  event.respondWith(caches.match(req).then(r => r || fetch(req)));
+  // Assets: cache-first, update in background
+  event.respondWith(
+    caches.match(req).then(cached => {
+      const fetchPromise = fetch(req).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
+        return res;
+      }).catch(() => cached);
+
+      return cached || fetchPromise;
+    })
+  );
 });
