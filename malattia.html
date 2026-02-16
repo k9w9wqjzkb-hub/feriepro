@@ -1,38 +1,42 @@
 <!DOCTYPE html>
-
 <html lang="it">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
-<title>iWork - Malattia</title>
-<link href="style.css" rel="stylesheet"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>iWork - Malattia</title>
+    <link rel="stylesheet" href="style.css?v=11">
+    <link rel="manifest" href="manifest.json?v=11">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="icon-167.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="icon-120.png">
 </head>
 <body data-page="malattia">
-<header class="ios-navbar"><div class="nav-content"><span class="nav-brand">Malattia</span></div></header>
-<main class="main-content">
-<header class="dashboard-header">
-<p class="date-subtitle">Riepilogo Annuale</p>
-<h1 class="large-title">Malattia</h1>
-</header>
-<div class="ios-card" style="margin:16px; border-left: 4px solid var(--red);">
-<span class="card-label" style="color:var(--red)">Malattia Filtrata (gg)</span>
-<span class="value" id="val-malattia">--</span>
-</div>
-<div class="filter-bar" style="padding:0 16px 16px 16px;">
-<select class="ios-select" id="filter-anno" onchange="renderizzaTabella('malattia')" style="width:100%;">
-<option value="all">Tutti gli anni</option>
-</select>
-</div>
-<div class="ios-card" style="margin:0 16px; padding:0; overflow:hidden;">
-<table style="width:100%; border-collapse:collapse;"><tbody id="history-body"></tbody></table>
-</div>
-</main>
-<nav class="tab-bar tab-liquid"><div class="liquid-indicator"></div>
-<a class="tab-item" href="index.html">🏠<span>Home</span></a>
-<a class="tab-item" href="ferie.html">📅<span>Ferie</span></a>
-<a class="tab-item active" href="malattia.html">🤒<span>Malattia</span></a>
-<a class="tab-item" href="calendario.html">🗓️<span>Calendario</span></a>
-</nav>
-<script src="app.js"></script>
+    <header class="ios-navbar"><div class="nav-content"><span class="nav-brand">Malattia</span></div></header>
+    <main class="main-content">
+        <header class="dashboard-header">
+            <p class="date-subtitle">Riepilogo Annuale</p>
+            <h1 class="large-title">Malattia</h1>
+        </header>
+        <div class="ios-card" style="margin:16px; border-left: 4px solid var(--red);">
+            <span class="card-label" style="color:var(--red)">Malattia Filtrata (gg)</span>
+            <span class="value" id="val-malattia">--</span>
+        </div>
+        <div class="filter-bar" style="padding:0 16px 16px 16px;">
+            <select id="filter-anno" class="ios-select" onchange="renderizzaTabella('malattia')" style="width:100%;">
+                <option value="all">Tutti gli anni</option>
+            </select>
+        </div>
+        <div class="ios-card" style="margin:0 16px; padding:0; overflow:hidden;">
+            <table style="width:100%; border-collapse:collapse;"><tbody id="history-body"></tbody></table>
+        </div>
+    </main>
+    <nav class="tab-bar tab-liquid">
+        <a href="index.html" class="tab-item">🏠<span>Home</span></a>
+        <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
+        <a href="malattia.html" class="tab-item active">🤒<span>Malattia</span></a>
+        <a href="calendario.html" class="tab-item">🗓️<span>Calendario</span></a>
+    </nav>
+    <script src="app.js?v=11"></script>
 </body>
 </html>
