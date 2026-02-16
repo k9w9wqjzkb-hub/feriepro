@@ -1,16 +1,16 @@
 // iWork Service Worker (v9)
-const CACHE_NAME = 'iwork-v10';
+const CACHE_NAME = 'iwork-v16';
 
 // Files to pre-cache (relative paths for GitHub Pages)
 const ASSETS = [
   './',
-  './index.html?v=10',
-  './ferie.html?v=10',
-  './malattia.html?v=10',
-  './calendario.html?v=10',
-  './style.css?v=10',
-  './app.js?v=10',
-  './manifest.json?v=10',
+  './index.html?v=16',
+  './ferie.html?v=16',
+  './malattia.html?v=16',
+  './calendario.html?v=16',
+  './style.css?v=16',
+  './app.js?v=16',
+  './manifest.json?v=16',
   './icon-192.png',
   './icon-512.png'
 ];
