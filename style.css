@@ -692,3 +692,65 @@ body[data-page="calendario"] td[style*="background: #F2F2F7"]{
 
 /* Title spacing on calendar page */
 body[data-page="calendario"] .dashboard-header{ padding-bottom: 8px; }
+
+/* =========================
+   CALENDARIO - FIX SCROLL + GRIGLIA
+   ========================= */
+
+/* wrapper: DEVE scrollare */
+.calendar-wrapper{
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+/* tabella: deve essere più larga dello schermo per far partire lo scroll */
+.calendar-table{
+  border-collapse: collapse !important;
+  table-layout: fixed;
+  width: max-content !important;      /* chiave: diventa larga quanto serve */
+  min-width: 1100px;                  /* forza larghezza > iPhone */
+}
+
+/* celle: righe ben visibili (verticali e orizzontali) */
+.calendar-table th,
+.calendar-table td{
+  border: 1px solid rgba(255,255,255,0.16) !important; /* griglia */
+}
+
+/* intestazione giorni: resta “sopra” e si vede bene */
+.calendar-table th{
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: rgba(20,20,22,0.78) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* prima colonna (mesi): sticky a sinistra durante lo scroll */
+.calendar-table td:first-child,
+.calendar-table th:first-child{
+  position: sticky;
+  left: 0;
+  z-index: 7;
+  min-width: 74px;                    /* mesi più leggibili */
+  background: rgba(20,20,22,0.78) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(255,255,255,0.22) !important;
+}
+
+/* =========================
+   HEADER - più compatto + logo più grande
+   ========================= */
+
+.ios-navbar{
+  padding: calc(22px + env(safe-area-inset-top)) 16px 10px !important; /* prima era molto più alto */
+}
+
+.nav-brand{
+  font-size: 22px !important;   /* ingrandisce iWork */
+  font-weight: 800 !important;
+  letter-spacing: -0.4px;
+}

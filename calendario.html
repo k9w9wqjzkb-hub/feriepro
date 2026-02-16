@@ -1,56 +1,32 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>iWork - Calendario</title>
-  <link rel="stylesheet" href="style.css?v=15">
-  <link rel="manifest" href="manifest.json?v=15">
-  <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
-  <link rel="apple-touch-icon" sizes="167x167" href="icon-167.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
-  <link rel="apple-touch-icon" sizes="120x120" href="icon-120.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>iWork - Calendario Orizzontale</title>
+    <link rel="stylesheet" href="style.css">
+    
 </head>
 <body data-page="calendario">
+    <main class="main-content">
+        <div class="calendar-wrapper">
+            <table class="calendar-table">
+                <thead>
+                    <tr id="calendarHeader"></tr>
+                </thead>
+                <tbody id="calendarBody"></tbody>
+            </table>
+        </div>
+    </main>
 
-  <header class="ios-navbar">
-    <div class="nav-content"><span class="nav-brand">iWork</span></div>
-  </header>
+    <nav class="tab-bar tab-liquid">
+        <a href="index.html" class="tab-item">🏠<span>Home</span></a>
+        <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
+        <a href="malattia.html" class="tab-item">🤒<span>Mal</span></a>
+        <a href="calendario.html" class="tab-item active">🗓️<span>Cal</span></a>
+        
+    </nav>
 
-  <main class="main-content">
-    <header class="dashboard-header">
-      <p class="date-subtitle" id="current-date"></p>
-      <h1 class="large-title">Calendario <span id="cal-year"></span></h1>
-    </header>
-
-    <div class="calendar-wrapper">
-      <table class="calendar-table">
-        <thead>
-          <tr id="calendarHeader"></tr>
-        </thead>
-        <tbody id="calendarBody"></tbody>
-      </table>
-    </div>
-  </main>
-
-  <nav class="tab-bar tab-liquid">
-    <div class="liquid-indicator" aria-hidden="true"></div>
-    <a href="index.html" class="tab-item">🏠<span>Home</span></a>
-    <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
-    <a href="malattia.html" class="tab-item">🤒<span>Malattia</span></a>
-    <a href="calendario.html" class="tab-item active">🗓️<span>Calendario</span></a>
-  </nav>
-
-  <script src="app.js?v=15"></script>
-  <script>
-    // Year label (no dependency on app.js)
-    (function(){
-      const y = new Date().getFullYear();
-      const el = document.getElementById('cal-year');
-      if (el) el.textContent = String(y);
-    })();
-  </script>
+    <script src="app.js"></script>
 </body>
 </html>
