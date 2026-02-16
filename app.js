@@ -1,7 +1,7 @@
 // Registrazione Service Worker per PWA (percorso relativo per GitHub Pages)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
+    navigator.serviceWorker.register('./sw.js?v=17')
       .then(reg => console.log('SW registrato con successo', reg))
       .catch(err => console.error('Errore SW:', err));
   });
@@ -24,12 +24,10 @@ function isoLocalDate(y, m0, d) {
   const dd = String(d).padStart(2, '0');
   return `${y}-${mm}-${dd}`;
 }
-
 function todayLocalISO() {
   const t = new Date();
   return isoLocalDate(t.getFullYear(), t.getMonth(), t.getDate());
 }
-
 function toITDate(iso) {
   return new Date(iso).toLocaleDateString('it-IT');
 }
@@ -88,29 +86,67 @@ function setMovimenti(m) {
 }
 
 /* =========================
+   STATE (edit mode)
+   ========================= */
+let EDIT_ID = null; // se valorizzato, la modale salva una modifica invece di inserire
+
+function canHavePianificato(tipo) {
+  return (tipo === 'ferie' || tipo === 'ferie_az' || tipo === 'rol' || tipo === 'conto');
+}
+
+function getPianificatoCheckboxEl() {
+  return document.getElementById('soloPianificato') || document.getElementById('in-pianificato');
+}
+function getPianificatoChecked() {
+  const cb = getPianificatoCheckboxEl();
+  return cb ? !!cb.checked : false;
+}
+function setPianificatoChecked(v) {
+  const cb = getPianificatoCheckboxEl();
+  if (cb) cb.checked = !!v;
+}
+
+/* =========================
    INIT
    ========================= */
 window.onload = () => {
   initSettings();
 
   const activePage = document.body.getAttribute('data-page');
+  // Titolo Calendario
+  if (activePage === 'calendario') {
+    const settings = getSettings();
+    const annoCorrente = settings.annoRiferimento || new Date().getFullYear();
+    const ct = document.getElementById('calendar-title');
+    if (ct) ct.textContent = `Calendario ${annoCorrente}`;
+  }
+
 
   popolaFiltroAnni();
 
   const fA = document.getElementById('filter-anno');
   const fT = document.getElementById('filter-tipo');
-  if (fA) fA.onchange = () => { renderizzaTabella(activePage); aggiornaInterfaccia(activePage); if (activePage === 'calendario') renderizzaCalendario(); };
-  if (fT) fT.onchange = () => { renderizzaTabella(activePage); aggiornaInterfaccia(activePage); if (activePage === 'calendario') renderizzaCalendario(); };
+  if (fA) fA.onchange = () => {
+    renderizzaTabella(activePage);
+    aggiornaInterfaccia(activePage);
+    if (activePage === 'calendario') renderizzaCalendario();
+  };
+  if (fT) fT.onchange = () => {
+    renderizzaTabella(activePage);
+    aggiornaInterfaccia(activePage);
+    if (activePage === 'calendario') renderizzaCalendario();
+  };
 
   aggiornaInterfaccia(activePage);
   if (document.getElementById('history-body')) renderizzaTabella(activePage);
   if (activePage === 'calendario') renderizzaCalendario();
 
   setupDate();
+  initLiquidTabBar();
 };
 
 /* =========================
-   CALENDARIO
+   CALENDARIO (orizzontale)
    ========================= */
 function renderizzaCalendario() {
   const tableBody = document.getElementById('calendarBody');
@@ -118,55 +154,43 @@ function renderizzaCalendario() {
   if (!tableBody || !tableHeader) return;
 
   const mesi = ["GEN", "FEB", "MAR", "APR", "MAG", "GIU", "LUG", "AGO", "SET", "OTT", "NOV", "DIC"];
-  const anno = new Date().getFullYear(); // sempre anno corrente
+  const anno = (getSettings().annoRiferimento || new Date().getFullYear());
 
-  const movimenti = getMovimenti().filter(m => {
-    const y = new Date(m.data).getFullYear();
-    return y === anno;
-  });
-
+  const movimentiAnno = getMovimenti().filter(m => new Date(m.data).getFullYear() === anno);
   const festivi = new Set(getFestivitaNazionaliIT(anno));
-  const patrono = `${anno}-12-07`; // Milano (Sant'Ambrogio)
+  const patrono = `${anno}-12-07`; // Sant'Ambrogio
 
-  // Header: MESE + 1-31
   tableHeader.innerHTML = '<th class="col-mese">MESE</th>';
   for (let i = 1; i <= 31; i++) tableHeader.innerHTML += `<th>${i}</th>`;
-
   tableBody.innerHTML = '';
 
   const sumOre = (arr) => arr.reduce((acc, x) => acc + (Number(x.ore) || 0), 0);
+  const hasPian = (arr) => arr.some(x => !!(x.pianificato || x.soloPianificato));
 
   mesi.forEach((mese, indexMese) => {
     let riga = `<tr><td class="col-mese">${mese}</td>`;
 
     for (let giorno = 1; giorno <= 31; giorno++) {
       const dt = new Date(anno, indexMese, giorno);
-
       if (dt.getMonth() !== indexMese) {
-        riga += `<td style="background:#F2F2F7;"></td>`;
+        riga += `<td class="bg-empty"></td>`;
         continue;
       }
 
       const dataISO = isoLocalDate(anno, indexMese, giorno);
-      const dow = dt.getDay(); // 0=Dom, 6=Sab
+      const dow = dt.getDay();
 
       let classe = "";
       let contenuto = "";
 
-      // Weekend
       if (dow === 0 || dow === 6) classe = "bg-weekend";
-
-      // Festivi nazionali + Patrono (rosso)
       if (festivi.has(dataISO) || dataISO === patrono) {
         classe = "bg-festivo";
         if (dataISO === patrono) contenuto = "P";
       }
 
-      // Movimenti del giorno (possono essere più di uno)
-      const movGiorno = movimenti.filter(m => m.data === dataISO);
-
-      if (movGiorno.length > 0) {
-        // raggruppo per tipo
+      const movGiorno = movimentiAnno.filter(m => m.data === dataISO);
+      if (movGiorno.length) {
         const mal = movGiorno.filter(m => m.tipo === 'malattia');
         const ferAz = movGiorno.filter(m => m.tipo === 'ferie_az');
         const avis = movGiorno.filter(m => m.tipo === 'avis');
@@ -174,40 +198,33 @@ function renderizzaCalendario() {
         const rol = movGiorno.filter(m => m.tipo === 'rol');
         const conto = movGiorno.filter(m => m.tipo === 'conto');
 
-      // Priorità colori (come richiesto)
-      if (mal.length) {
-         classe = "bg-malattia";
-         contenuto = "M";
-
-      } else if (ferAz.length) {
-        classe = "bg-ferie-az";
-        contenuto = "AZ";
-        if (hasPian(ferAz)) classe += " is-pian";
-
-      } else if (avis.length) {
-        classe = "bg-avis";
-        contenuto = "AV"; // oppure "A"
-      // AVIS NON usa pianificato (ma se vuoi: abilitiamo anche qui)
-      // if (hasPian(avis)) classe += " is-pian";
-
-      } else if (ferie.length) {
-        classe = "bg-ferie";
-        const ore = sumOre(ferie);
-        contenuto = (Math.abs(ore - 8) < 0.001) ? "F" : String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
-        if (hasPian(ferie)) classe += " is-pian";
-
-      } else if (rol.length) {
-        classe = "bg-rol";
-        const ore = sumOre(rol);
-        contenuto = String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
-        if (hasPian(rol)) classe += " is-pian";
-
-      } else if (conto.length) {
-        classe = "bg-conto";
-        const ore = sumOre(conto);
-        contenuto = String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
-        if (hasPian(conto)) classe += " is-pian";
-      }
+        // Priorità: malattia > ferie aziendali > avis > ferie > rol > conto
+        if (mal.length) {
+          classe = "bg-malattia";
+          contenuto = "M";
+        } else if (ferAz.length) {
+          classe = "bg-ferie-az";
+          contenuto = "AZ";
+          if (hasPian(ferAz)) classe += " is-pian";
+        } else if (avis.length) {
+          classe = "bg-avis";
+          contenuto = "AV";
+        } else if (ferie.length) {
+          classe = "bg-ferie";
+          const ore = sumOre(ferie);
+          contenuto = (Math.abs(ore - 8) < 0.001) ? "F" : String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
+          if (hasPian(ferie)) classe += " is-pian";
+        } else if (rol.length) {
+          classe = "bg-rol";
+          const ore = sumOre(rol);
+          contenuto = String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
+          if (hasPian(rol)) classe += " is-pian";
+        } else if (conto.length) {
+          classe = "bg-conto";
+          const ore = sumOre(conto);
+          contenuto = String(ore % 1 === 0 ? ore.toFixed(0) : ore.toFixed(1)).replace('.', ',');
+          if (hasPian(conto)) classe += " is-pian";
+        }
       }
 
       riga += `<td class="${classe}">${contenuto}</td>`;
@@ -226,14 +243,16 @@ function popolaFiltroAnni() {
   if (!filterAnno) return;
 
   const movimenti = getMovimenti();
+  const settings = getSettings();
+  const annoCorrente = settings.annoRiferimento || new Date().getFullYear();
   const anni = movimenti.map(m => new Date(m.data).getFullYear());
-  anni.push(new Date().getFullYear());
+  anni.push(annoCorrente);
 
   const anniUnici = [...new Set(anni)].sort((a, b) => b - a);
 
   let html = '<option value="all">Tutti gli anni</option>';
   anniUnici.forEach(anno => {
-    const selected = (anno === new Date().getFullYear()) ? 'selected' : '';
+    const selected = (anno === annoCorrente) ? 'selected' : '';
     html += `<option value="${anno}" ${selected}>${anno}</option>`;
   });
 
@@ -242,38 +261,39 @@ function popolaFiltroAnni() {
 
 /* =========================
    DASHBOARD / CONSUNTIVO
+   - Grande: RESTANTI (saldo reale)
+   - Piccolo: Prev: RESTANTI - PROGRAMMATO (sempre visibile)
    ========================= */
 function aggiornaInterfaccia(page) {
   const movimenti = getMovimenti();
   const settings = getSettings();
 
+  const annoCorrente = settings.annoRiferimento || new Date().getFullYear();
+
   const filtroAnnoEl = document.getElementById('filter-anno');
   const filtroAnnoVal = filtroAnnoEl ? filtroAnnoEl.value : 'all';
 
-  // Se "all" => per le CARD uso anno corrente (così hai un riferimento pratico)
+  // Se "all" => per le CARD uso anno corrente
   const annoSelezionato = (filtroAnnoEl && filtroAnnoVal !== 'all')
     ? parseInt(filtroAnnoVal, 10)
-    : new Date().getFullYear();
+    : annoCorrente;
 
-  const isAnnoCorrente = annoSelezionato === new Date().getFullYear();
+  const isAnnoCorrente = annoSelezionato === annoCorrente;
 
   let calcoli = {
     ferie: { ap: isAnnoCorrente ? settings.residuiAP.ferie : 0, spet: isAnnoCorrente ? settings.spettanteAnnuo.ferie : 0, god: 0, pian: 0 },
-    rol: { ap: isAnnoCorrente ? settings.residuiAP.rol : 0, spet: isAnnoCorrente ? settings.spettanteAnnuo.rol : 0, god: 0, pian: 0 },
+    rol:   { ap: isAnnoCorrente ? settings.residuiAP.rol   : 0, spet: isAnnoCorrente ? settings.spettanteAnnuo.rol   : 0, god: 0, pian: 0 },
     conto: { ap: isAnnoCorrente ? settings.residuiAP.conto : 0, spet: isAnnoCorrente ? settings.spettanteAnnuo.conto : 0, god: 0, pian: 0 },
     malattia: 0
   };
 
   movimenti.forEach(m => {
     const annoM = new Date(m.data).getFullYear();
-    const ore = Number(m.ore) || 0;
-
     if (annoM !== annoSelezionato) return;
 
-    if (m.tipo === 'malattia') {
-      calcoli.malattia += ore;
-      return;
-    }
+    const ore = Number(m.ore) || 0;
+
+    if (m.tipo === 'malattia') { calcoli.malattia += ore; return; }
 
     if (m.tipo.startsWith('mat_')) {
       const cat = m.tipo.split('_')[1];
@@ -283,12 +303,11 @@ function aggiornaInterfaccia(page) {
 
     if (m.tipo === 'avis') return;
 
-    // ferie_az conta nella famiglia ferie
-    let tipoReale = (m.tipo === 'ferie_az') ? 'ferie' : m.tipo;
-
+    const tipoReale = (m.tipo === 'ferie_az') ? 'ferie' : m.tipo;
     if (!calcoli[tipoReale]) return;
 
-    if (m.pianificato) calcoli[tipoReale].pian += ore;
+    const isPian = !!(m.pianificato || m.soloPianificato);
+    if (isPian) calcoli[tipoReale].pian += ore;
     else calcoli[tipoReale].god += ore;
   });
 
@@ -298,14 +317,23 @@ function aggiornaInterfaccia(page) {
     const el = document.getElementById(id);
     if (el) el.innerText = fmtGG(ore);
   };
-
-  const setCardPrev = (id, ore) => {
+  const setPrev = (id, saldoOre, pianOre) => {
     const el = document.getElementById(id);
     if (!el) return;
-    el.innerText = "Prev: " + fmtGG(Math.max(0, ore));
+    const prevOre = Math.max(0, (Number(saldoOre) || 0) - (Number(pianOre) || 0));
+    el.innerText = "Prev: " + fmtGG(prevOre);
   };
 
-  // Restanti (AP + SPET - GOD)
+
+  // Prev sempre visibile: Prev = saldo - pian (se nessun pian => uguale al saldo)
+  const setCardPrev = (id, saldoOre, pianOre) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const prev = Math.max(0, saldoOre - (pianOre || 0));
+    el.innerText = "Prev: " + fmtGG(prev);
+  };
+
+  // saldo reale (restanti effettivi)
   const saldoFerie = (calcoli.ferie.ap + calcoli.ferie.spet - calcoli.ferie.god);
   const saldoRol   = (calcoli.rol.ap   + calcoli.rol.spet   - calcoli.rol.god);
   const saldoConto = (calcoli.conto.ap + calcoli.conto.spet - calcoli.conto.god);
@@ -315,14 +343,19 @@ function aggiornaInterfaccia(page) {
   setCard('val-conto', saldoConto);
 
   // Prev (saldo - pianificato)
-  setCardPrev('val-ferie-prev', (saldoFerie - calcoli.ferie.pian));
-  setCardPrev('val-rol-prev',   (saldoRol   - calcoli.rol.pian));
-  setCardPrev('val-conto-prev', (saldoConto - calcoli.conto.pian));
+  setPrev('val-ferie-pian', saldoFerie, calcoli.ferie.pian);
+  setPrev('val-rol-pian', saldoRol, calcoli.rol.pian);
+  setPrev('val-conto-pian', saldoConto, calcoli.conto.pian);
+
+// Prev: saldo - pian (sempre)
+  setCardPrev('val-ferie-pian', saldoFerie, calcoli.ferie.pian);
+  setCardPrev('val-rol-pian',   saldoRol,   calcoli.rol.pian);
+  setCardPrev('val-conto-pian', saldoConto, calcoli.conto.pian);
 
   const elMal = document.getElementById('val-malattia');
   if (elMal) elMal.innerText = fmtGG(calcoli.malattia);
 
-  // TABELLA CONSUNTIVO (ore, come prima)
+  // Consuntivo (ore)
   const tbody = document.getElementById('consuntivo-body');
   if (tbody) {
     tbody.innerHTML = '';
@@ -341,7 +374,7 @@ function aggiornaInterfaccia(page) {
 }
 
 /* =========================
-   REPORT TABLE
+   REPORT TABLE (✏️ ℹ️ 🗑)
    ========================= */
 function renderizzaTabella(page) {
   const mov = getMovimenti();
@@ -374,13 +407,12 @@ function renderizzaTabella(page) {
       const oreNum = Number(m.ore);
       const oreTxt = (m.tipo === 'avis') ? '-' : (Number.isFinite(oreNum) ? oreNum.toFixed(2) + 'h' : '0.00h');
 
-      // piccolo indicatore pianificato (solo per ferie/rol/conto/ferie_az)
-      const isPian = !!m.pianificato && (m.tipo === 'ferie' || m.tipo === 'ferie_az' || m.tipo === 'rol' || m.tipo === 'conto');
-      const pianTxt = isPian ? ' <span style="color:#8E8E93; font-weight:700;">(P)</span>' : '';
-
       const badgeClass = m.tipo.startsWith('mat_') ? 'maturazione' : m.tipo;
 
-      return `<tr style="border-bottom:1px solid rgba(0,0,0,0.06);">
+      const isPian = !!(m.pianificato || m.soloPianificato) && canHavePianificato(m.tipo);
+      const pianTxt = isPian ? ' <span style="color:#8E8E93; font-weight:700;">(P)</span>' : '';
+
+      return `<tr style="border-bottom:0.5px solid #EEE;">
         <td style="padding:12px;">${toITDate(m.data)}</td>
         <td><span class="badge-${badgeClass}">${label}</span>${pianTxt}</td>
         <td style="font-weight:700;">${oreTxt}</td>
@@ -403,6 +435,12 @@ function toggleModal(s) {
   document.getElementById('add-modal')?.classList.toggle('active', !!s);
   const o = document.getElementById('modal-overlay');
   if (o) o.style.display = s ? 'block' : 'none';
+
+  // se chiudo, resetto la modalità modifica
+  if (!s) resetEditMode();
+
+  // se apro in modalità "nuovo", resetto checkbox
+  if (s && EDIT_ID === null) setPianificatoChecked(false);
 }
 
 function toggleSheet(s) {
@@ -412,11 +450,23 @@ function toggleSheet(s) {
   if (o) o.style.display = s ? 'block' : 'none';
 }
 
+function setModalHeader(isEdit) {
+  const titleEl = document.querySelector('#add-modal .modal-title');
+  const actionBtn = document.querySelector('#add-modal .modal-nav button:last-child');
+  if (titleEl) titleEl.textContent = isEdit ? 'Modifica Record' : 'Nuovo Record';
+  if (actionBtn) actionBtn.textContent = isEdit ? 'Salva' : 'Aggiungi';
+}
+
+function resetEditMode() {
+  EDIT_ID = null;
+  setModalHeader(false);
+}
+
 /* =========================
    CONSOLIDA / AZZERA
    ========================= */
 function azzeraGoduti() {
-  if (!confirm("Consolidare il saldo attuale al 01/01?")) return;
+  if (!confirm('Consolidare il saldo attuale al 01/01?')) return;
 
   let s = getSettings();
   const mov = getMovimenti();
@@ -430,8 +480,9 @@ function azzeraGoduti() {
         const o = Number(m.ore) || 0;
         if (m.tipo === 'mat_' + cat) mat += o;
         else if (m.tipo === cat || (cat === 'ferie' && m.tipo === 'ferie_az')) {
-          // consolido solo i GODUTI (non i pianificati)
-          if (!m.pianificato) god += o;
+          // consolido solo i GODUTI (non pianificati)
+          const isPian = !!(m.pianificato || m.soloPianificato);
+          if (!isPian) god += o;
         }
       }
     });
@@ -440,42 +491,59 @@ function azzeraGoduti() {
     s.spettanteAnnuo[cat] = (cat === 'conto') ? 0 : (cat === 'ferie' ? 216 : 62);
   });
 
-  s.dataInizioConteggio = new Date().getFullYear() + "-01-01";
+  s.dataInizioConteggio = new Date().getFullYear() + '-01-01';
   localStorage.setItem('userSettings', JSON.stringify(s));
   location.reload();
 }
 
 /* =========================
    SAVE / AUTO ORE
+   - usa la stessa modale per inserire e modificare
    ========================= */
 function saveData() {
   let t = document.getElementById('in-tipo')?.value;
   let o = parseFloat(document.getElementById('in-ore')?.value);
   const d = document.getElementById('in-data')?.value;
-  const note = document.getElementById('in-note') ? (document.getElementById('in-note').value || "") : "";
+  const note = document.getElementById('in-note') ? (document.getElementById('in-note').value || '') : '';
 
-  const pianFlag = document.getElementById('soloPianificato')?.checked || false;
-
-  if (!d) return alert("Data mancante");
-  if (!t) return alert("Tipo mancante");
+  if (!d) return alert('Data mancante');
+  if (!t) return alert('Tipo mancante');
 
   if (t === 'maturazione') {
-    const res = prompt("Destinazione? (ferie, rol, conto)");
+    const res = prompt('Destinazione? (ferie, rol, conto)');
     if (['ferie', 'rol', 'conto'].includes(res)) t = 'mat_' + res;
     else return;
   }
 
+  // Validazione ore: AVIS può essere 0, gli altri > 0
   const oreRichieste = (t !== 'avis');
   if (oreRichieste) {
-    if (!Number.isFinite(o) || o <= 0) return alert("Inserisci un numero di ore > 0");
+    if (!Number.isFinite(o) || o <= 0) return alert('Inserisci un numero di ore > 0');
   } else {
     if (!Number.isFinite(o)) o = 0;
   }
 
   // pianificato si applica solo a ferie/rol/conto/ferie_az
-  const pianificato = (t === 'ferie' || t === 'ferie_az' || t === 'rol' || t === 'conto') ? pianFlag : false;
+  const pianFlag = getPianificatoChecked();
+  const pianificato = canHavePianificato(t) ? pianFlag : false;
 
   const m = getMovimenti();
+
+  if (EDIT_ID !== null) {
+    const idx = m.findIndex(x => x.id === EDIT_ID);
+    if (idx < 0) {
+      // se per qualche motivo il record non c'è più, ricado su inserimento
+      EDIT_ID = null;
+    } else {
+      m[idx] = { ...m[idx], tipo: t, ore: o, data: d, note, pianificato };
+      // pulizia retrocompatibilità
+      delete m[idx].soloPianificato;
+      setMovimenti(m);
+      location.reload();
+      return;
+    }
+  }
+
   m.push({ tipo: t, ore: o, data: d, note, pianificato, id: Date.now() });
   setMovimenti(m);
   location.reload();
@@ -488,7 +556,15 @@ function gestisciAutoOre() {
 
   if (t === 'malattia' || t === 'ferie_az') i.value = 8;
   else if (t === 'avis') i.value = 0;
-  else i.value = "";
+  else i.value = '';
+
+  // mostra/nasconde checkbox pianificato (se presente)
+  const cb = getPianificatoCheckboxEl();
+  if (cb) {
+    const wrap = cb.closest('.checkbox-row') || cb.closest('.form-row') || cb.parentElement;
+    if (wrap) wrap.style.display = canHavePianificato(t) ? 'block' : 'none';
+    if (!canHavePianificato(t)) cb.checked = false;
+  }
 }
 
 /* =========================
@@ -522,9 +598,7 @@ function toggleSettings() {
       </div>`;
     });
 
-    c.innerHTML += `<button onclick="azzeraGoduti()" style="width:100%; background:#FF3B30; color:white; border:none; padding:12px; border-radius:8px; font-weight:700; margin-top:10px;">
-      CONSOLIDA E AZZERA
-    </button>`;
+    c.innerHTML += `<button onclick="azzeraGoduti()" style="width:100%; background:#FF3B30; color:white; border:none; padding:12px; border-radius:8px; font-weight:700; margin-top:10px;">CONSOLIDA E AZZERA</button>`;
   }
 }
 
@@ -542,7 +616,7 @@ function saveSettings() {
    AZIONI RECORD
    ========================= */
 function elimina(id) {
-  if (!confirm("Eliminare?")) return;
+  if (!confirm('Eliminare?')) return;
   const m = getMovimenti();
   setMovimenti(m.filter(x => x.id !== id));
   location.reload();
@@ -551,85 +625,104 @@ function elimina(id) {
 function info(id) {
   const m = getMovimenti();
   const r = m.find(x => x.id === id);
-  if (!r) return alert("Record non trovato");
+  if (!r) return alert('Record non trovato');
 
   let label = r.tipo.replace('mat_', 'MAT. ').toUpperCase();
-  if (r.tipo === 'ferie_az') label = "FERIE AZ.";
-  if (r.tipo === 'malattia') label = "MALATTIA";
-  if (r.tipo === 'avis') label = "AVIS";
+  if (r.tipo === 'ferie_az') label = 'FERIE AZ.';
+  if (r.tipo === 'malattia') label = 'MALATTIA';
+  if (r.tipo === 'avis') label = 'AVIS';
 
   const ore = Number(r.ore) || 0;
   const oreTxt = (r.tipo === 'avis') ? '-' : ore.toFixed(2) + 'h';
-  const pian = r.pianificato ? "Sì" : "No";
-  const note = (r.note || "").trim();
+  const isPian = !!(r.pianificato || r.soloPianificato);
+  const pian = isPian ? 'Sì' : 'No';
+  const note = (r.note || '').trim();
 
   alert(
     `Data: ${toITDate(r.data)}\n` +
     `Tipo: ${label}\n` +
     `Ore: ${oreTxt}\n` +
-    ((r.tipo !== 'malattia' && !r.tipo.startsWith('mat_') && r.tipo !== 'avis') ? `Pianificato: ${pian}\n` : "") +
-    (note ? `Note: ${note}` : "")
+    (canHavePianificato(r.tipo) ? `Pianificato: ${pian}\n` : '') +
+    (note ? `Note: ${note}` : '')
   );
 }
 
 function modifica(id) {
-  const mov = getMovimenti();
-  const idx = mov.findIndex(x => x.id === id);
-  if (idx < 0) return alert("Record non trovato");
+  const m = getMovimenti();
+  const r = m.find(x => x.id === id);
+  if (!r) return alert('Record non trovato');
 
-  const r = mov[idx];
+  EDIT_ID = id;
+  setModalHeader(true);
 
-  const data = prompt("Data (YYYY-MM-DD):", r.data);
-  if (data === null) return;
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return alert("Formato data non valido (usa YYYY-MM-DD)");
+  // popola campi
+  const tipoEl = document.getElementById('in-tipo');
+  const oreEl = document.getElementById('in-ore');
+  const dataEl = document.getElementById('in-data');
+  const noteEl = document.getElementById('in-note');
 
-  let tipo = prompt(
-    "Tipo (ferie, ferie_az, rol, conto, avis, malattia, mat_ferie, mat_rol, mat_conto):",
-    r.tipo
-  );
-  if (tipo === null) return;
-  tipo = (tipo || "").trim();
+  if (tipoEl) tipoEl.value = r.tipo;
+  if (dataEl) dataEl.value = r.data;
+  if (noteEl) noteEl.value = r.note || '';
 
-  const tipiValidi = new Set(['ferie','ferie_az','rol','conto','avis','malattia','mat_ferie','mat_rol','mat_conto']);
-  if (!tipiValidi.has(tipo)) return alert("Tipo non valido");
+  // ore di default coerenti (ma se record ha ore, tengo quelle)
+  let oreVal = Number(r.ore);
+  if (!Number.isFinite(oreVal)) oreVal = 0;
+  if (oreEl) oreEl.value = oreVal;
 
-  // ore default coerenti
-  let oreDefault = Number(r.ore) || 0;
-  if (tipo === 'malattia' || tipo === 'ferie_az') oreDefault = 8;
-  if (tipo === 'avis') oreDefault = 0;
+  const isPian = !!(r.pianificato || r.soloPianificato);
+  setPianificatoChecked(canHavePianificato(r.tipo) ? isPian : false);
 
-  let oreStr = prompt("Ore:", String(oreDefault).replace('.', ','));
-  if (oreStr === null) return;
-  oreStr = oreStr.replace(',', '.');
-  let ore = parseFloat(oreStr);
-  if (!Number.isFinite(ore)) ore = 0;
+  gestisciAutoOre(); // aggiorna visibilità checkbox e auto-ore solo se serve
+  // se tipo è malattia/ferie_az vogliamo comunque mostrare le ore del record (non sovrascrivere)
+  if (oreEl) oreEl.value = oreVal;
 
-  if (tipo !== 'avis') {
-    if (!Number.isFinite(ore) || ore <= 0) return alert("Inserisci un numero di ore > 0");
-  }
-
-  const note = prompt("Note (opzionale):", r.note || "");
-  if (note === null) return;
-
-  // Pianificato (solo per ferie/rol/conto/ferie_az)
-  let pianificato = !!r.pianificato;
-  const canHavePian = (tipo === 'ferie' || tipo === 'ferie_az' || tipo === 'rol' || tipo === 'conto');
-  if (canHavePian) {
-    const resp = prompt("Solo Pianificato? (S/N)", pianificato ? "S" : "N");
-    if (resp === null) return;
-    pianificato = String(resp).trim().toUpperCase().startsWith('S');
-  } else {
-    pianificato = false;
-  }
-
-  mov[idx] = { ...r, data, tipo, ore, note, pianificato };
-  setMovimenti(mov);
-  location.reload();
+  toggleModal(true);
 }
 
 /* =========================
    DATE + BACKUP
    ========================= */
+
+/* =========================
+   LIQUID TAB BAR INDICATOR
+   ========================= */
+function initLiquidTabBar() {
+  const nav = document.querySelector('.tab-liquid');
+  if (!nav) return;
+
+  let indicator = nav.querySelector('.liquid-indicator');
+  if (!indicator) {
+    indicator = document.createElement('div');
+    indicator.className = 'liquid-indicator';
+    nav.appendChild(indicator);
+  }
+
+  const move = () => {
+    const active = nav.querySelector('.tab-item.active');
+    if (!active) return;
+    const navRect = nav.getBoundingClientRect();
+    const aRect = active.getBoundingClientRect();
+    const left = aRect.left - navRect.left;
+    indicator.style.width = aRect.width + 'px';
+    indicator.style.transform = `translateX(${left}px)`;
+  };
+
+  // initial
+  requestAnimationFrame(move);
+  // on resize/orientation
+  window.addEventListener('resize', () => requestAnimationFrame(move));
+
+  // if user taps a tab, move immediately
+  nav.querySelectorAll('.tab-item').forEach(a => {
+    a.addEventListener('click', () => {
+      nav.querySelectorAll('.tab-item').forEach(x => x.classList.remove('active'));
+      a.classList.add('active');
+      requestAnimationFrame(move);
+    });
+  });
+}
+
 function setupDate() {
   const cd = document.getElementById('current-date');
   if (cd) {
@@ -665,43 +758,4 @@ function importBackup(e) {
     location.reload();
   };
   r.readAsText(file);
-}
-
-
-/* =========================
-   LIQUID TAB INDICATOR
-   ========================= */
-function initLiquidTabBar() {
-  const nav = document.querySelector('nav.tab-liquid');
-  if (!nav) return;
-  const indicator = nav.querySelector('.liquid-indicator');
-  if (!indicator) return;
-
-  const items = Array.from(nav.querySelectorAll('a.tab-item'));
-  if (!items.length) return;
-
-  const moveTo = (el) => {
-    const navRect = nav.getBoundingClientRect();
-    const r = el.getBoundingClientRect();
-    const left = r.left - navRect.left;
-    indicator.style.width = r.width + 'px';
-    indicator.style.transform = `translateX(${left}px)`;
-  };
-
-  const active = nav.querySelector('a.tab-item.active') || items[0];
-  // defer until layout is stable
-  requestAnimationFrame(() => moveTo(active));
-
-  items.forEach(a => {
-    a.addEventListener('click', () => {
-      items.forEach(x => x.classList.remove('active'));
-      a.classList.add('active');
-      moveTo(a);
-    });
-  });
-
-  window.addEventListener('resize', () => {
-    const a = nav.querySelector('a.tab-item.active') || items[0];
-    moveTo(a);
-  });
 }
