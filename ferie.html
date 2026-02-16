@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>iWork - Storico</title>
-    <link rel="stylesheet" href="style.css?v=13">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body data-page="ferie">
     <header class="ios-navbar"><div class="nav-content"><span class="nav-brand">Storico</span></div></header>
@@ -17,12 +17,10 @@
             <div class="ios-card" style="border-left: 4px solid var(--blue);">
                 <span class="card-label" style="color:var(--blue)">Ferie (gg)</span>
                 <span class="value" id="val-ferie">--</span>
-                <span class="subvalue" id="val-ferie-pian">Prev: --</span>
             </div>
             <div class="ios-card" style="border-left: 4px solid var(--orange);">
                 <span class="card-label" style="color:var(--orange)">Permessi (gg)</span>
                 <span class="value" id="val-rol">--</span>
-                <span class="subvalue" id="val-rol-pian">Prev: --</span>
             </div>
         </section>
         <div class="filter-bar" style="padding:16px; display:flex; gap:8px;">
@@ -41,12 +39,12 @@
             <table style="width:100%; border-collapse:collapse;"><tbody id="history-body"></tbody></table>
         </div>
     </main>
-    <nav class="tab-bar tab-liquid">
+    <nav class="tab-bar">
         <a href="index.html" class="tab-item">🏠<span>Home</span></a>
         <a href="ferie.html" class="tab-item active">📅<span>Ferie</span></a>
         <a href="malattia.html" class="tab-item">🤒<span>Malattia</span></a>
         <a href="calendario.html" class="tab-item">🗓️<span>Calendario</span></a>
     </nav>
-    <script src="app.js?v=13"></script>
+    <script src="app.js"></script>
 </body>
 </html>
