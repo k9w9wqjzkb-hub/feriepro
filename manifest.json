@@ -1,6 +1,8 @@
 {
   "short_name": "iWork",
   "name": "iWork - Gestione Ore",
+  "description": "Monitoraggio ferie, permessi e malattie con design premium.",
+  "lang": "it",
   "icons": [
     {
       "src": "icon-192.png",
@@ -27,7 +29,20 @@
   ],
   "start_url": "./index.html?v=17",
   "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
   "background_color": "#0B0B0D",
   "theme_color": "#0B0B0D",
-  "display": "standalone"
+  "shortcuts": [
+    {
+      "name": "Calendario",
+      "url": "./calendario.html?v=17",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Ferie",
+      "url": "./ferie.html?v=17",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
 }

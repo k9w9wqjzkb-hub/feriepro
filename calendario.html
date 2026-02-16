@@ -3,94 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iWork - Calendario Orizzontale</title>
+    <title>iWork - Calendario</title>
     <link rel="stylesheet" href="style.css?v=17">
-    <style>
-        :root {
-            --sabato: #E5E5EA;
-            --domenica: #8E8E93;
-            --festivo: #FF3B30;
-            --ferie-az: #004085;
-            --ferie: #34C759;
-            --rol: #FF9500;
-            --avis: #FFD60A;
-            --malattia: #AF52DE;
-        }
-
-        /* Forza il layout a tutto schermo */
-        .main-content { padding: 5px !important; margin: 0 !important; }
-
-        .calendar-wrapper {
-            width: 100%;
-            background: white;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .grid-table {
-            border-collapse: collapse;
-            width: 100%;
-            table-layout: fixed;
-        }
-
-        .grid-table th, .grid-table td {
-            border: 0.5px solid #bbb;
-            text-align: center;
-            padding: 0;
-            height: 5.5vh; /* Altezza dinamica basata sul display orizzontale */
-            font-size: 10px;
-        }
-
-        .col-mese { 
-            width: 50px; 
-            font-weight: 700;
-            background: #f2f2f7;
-            font-size: 10px !important;
-        }
-
-        /* Colori richiesti dall'allegato */
-        .bg-sabato { background-color: var(--sabato); }
-        .bg-domenica { background-color: var(--domenica); color: white; }
-        .bg-festivo { background-color: var(--festivo); color: white; }
-        .bg-ferie-coll { background-color: var(--ferie-az); color: white; }
-        .bg-ferie-ind { background-color: var(--ferie); color: white; }
-        .bg-malattia { background-color: var(--malattia); color: white; }
-        .bg-avis { background-color: var(--avis); color: black; }
-        .text-rol { color: var(--rol); font-weight: bold; font-size: 9px; }
-
-        /* Nascondi la tab-bar in orizzontale per guadagnare spazio */
-        @media (orientation: landscape) {
-            .tab-bar { display: none; }
-            .ios-navbar { display: none; }
-            .main-content { padding: 0 !important; }
-            .grid-table td, .grid-table th { height: 7.5vh; font-size: 11px; }
-        }
-    </style>
-<meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json?v=17">
     <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body data-page="calendario">
+
+    <header class="ios-navbar">
+        <div class="nav-content">
+            <span class="nav-brand">Calendario</span>
+        </div>
+    </header>
+
     <main class="main-content">
+        <header class="dashboard-header">
+            <p class="date-subtitle">Pianificazione Annuale</p>
+            <h1 class="large-title">Presenze</h1>
+        </header>
+
         <div class="calendar-wrapper">
             <table class="grid-table">
                 <thead>
-                    <tr id="calendarHeader"></tr>
+                    <tr id="calendarHeader">
+                        </tr>
                 </thead>
-                <tbody id="calendarBody"></tbody>
+                <tbody id="calendarBody">
+                    </tbody>
             </table>
+        </div>
+
+        <div class="legend-container" style="padding: 16px; display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; opacity: 0.9;">
+            <div class="legend-item"><i class="bg-festivo" style="display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px;"></i> Festivo</div>
+            <div class="legend-item"><i class="bg-ferie" style="display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px;"></i> Ferie</div>
+            <div class="legend-item"><i class="bg-ferie-az" style="display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px;"></i> Chiusura</div>
+            <div class="legend-item"><i class="bg-rol" style="display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px;"></i> ROL</div>
+            <div class="legend-item"><i class="bg-avis" style="display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px;"></i> AVIS</div>
+            <div class="legend-item" style="border: 1px dashed rgba(255,255,255,0.5); padding: 0 4px; border-radius: 3px;">Pianificato</div>
         </div>
     </main>
 
-    <nav class="tab-bar">
+    <nav class="tab-bar tab-liquid">
         <a href="index.html" class="tab-item">🏠<span>Home</span></a>
         <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
-        <a href="malattia.html" class="tab-item">🤒<span>Mal</span></a>
-        <a href="calendario.html" class="tab-item active">🗓️<span>Cal</span></a>
+        <a href="malattia.html" class="tab-item">🤒<span>Malattia</span></a>
+        <a href="calendario.html" class="tab-item active">🗓️<span>Calendario</span></a>
         
+        <div class="liquid-indicator"></div>
     </nav>
 
     <script src="app.js?v=17"></script>
