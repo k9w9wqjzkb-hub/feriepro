@@ -549,3 +549,146 @@ body{
     background: rgba(255,255,255,0.03);
   }
 }
+
+/* =========================================================
+   v15 FIXES
+   - Tab bar: prevent lateral spill (real width clamp)
+   - Calendar: restore black glass + strong grid + colors + weekend
+   ========================================================= */
+
+/* --- TAB BAR: hard clamp inside viewport (bar itself, not just content) --- */
+.tab-bar.tab-liquid{
+  left: 50% !important;
+  right: auto !important;
+  width: min(520px, calc(100% - 28px)) !important;
+  transform: translateX(-50%) !important;
+}
+
+@media (max-width: 390px){
+  .tab-bar.tab-liquid{
+    width: calc(100% - 20px) !important;
+  }
+}
+
+/* If the shadow makes it "look" like overflow, keep bar clipped but allow shadow inside */
+.tab-bar.tab-liquid{ overflow: clip; }
+
+/* --- CALENDAR: black glass look (always, because you liked it) --- */
+body[data-page="calendario"] .calendar-wrapper{
+  margin: 10px 14px;
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(18,18,20,0.60);
+  backdrop-filter: blur(24px) saturate(1.35);
+  -webkit-backdrop-filter: blur(24px) saturate(1.35);
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow:
+    0 14px 38px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+body[data-page="calendario"] .calendar-table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  color: rgba(255,255,255,0.92);
+}
+
+/* strong grid like before */
+body[data-page="calendario"] .calendar-table th,
+body[data-page="calendario"] .calendar-table td{
+  border: 1px solid rgba(255,255,255,0.14);
+  min-width: 28px;
+  height: 30px;
+  text-align: center;
+  padding: 0;
+}
+
+body[data-page="calendario"] .calendar-table th{
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.85);
+  font-weight: 700;
+}
+
+/* sticky month column */
+body[data-page="calendario"] .calendar-table .col-mese,
+body[data-page="calendario"] .calendar-table td:first-child{
+  position: sticky;
+  left: 0;
+  z-index: 6;
+  min-width: 64px;
+  font-weight: 800;
+  background: rgba(10,10,12,0.65);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* weekend */
+body[data-page="calendario"] .bg-weekend{
+  background: rgba(255,255,255,0.10) !important;
+  color: rgba(255,255,255,0.92) !important;
+}
+
+/* Festività: rosso */
+body[data-page="calendario"] .bg-festivo{
+  background: #FF3B30 !important;
+  color: #fff !important;
+  font-weight: 800;
+}
+
+/* Ferie AZ: arancio */
+body[data-page="calendario"] .bg-ferie-az{
+  background: #FF9500 !important;
+  color: #111 !important;
+  font-weight: 800;
+}
+
+/* Ferie personali: verde */
+body[data-page="calendario"] .bg-ferie{
+  background: #34C759 !important;
+  color: #0b1a10 !important;
+  font-weight: 800;
+}
+
+/* ROL: giallo */
+body[data-page="calendario"] .bg-rol{
+  background: #FFCC00 !important;
+  color: #111 !important;
+  font-weight: 900;
+}
+
+/* Conto ore: teal / azzurrino (distinto) */
+body[data-page="calendario"] .bg-conto{
+  background: #64D2FF !important;
+  color: #061018 !important;
+  font-weight: 900;
+}
+
+/* Malattia: marrone */
+body[data-page="calendario"] .bg-malattia{
+  background: #5D4037 !important;
+  color: #fff !important;
+  font-weight: 800;
+}
+
+/* AVIS: blu */
+body[data-page="calendario"] .bg-avis{
+  background: #0A84FF !important;
+  color: #fff !important;
+  font-weight: 900;
+}
+
+/* Pianificato: bordo tratteggiato */
+body[data-page="calendario"] .is-pian{
+  outline: 2px dashed rgba(255,255,255,0.9);
+  outline-offset: -3px;
+}
+
+/* empty (non existing day) */
+body[data-page="calendario"] td[style*="background:#F2F2F7"],
+body[data-page="calendario"] td[style*="background: #F2F2F7"]{
+  background: rgba(255,255,255,0.05) !important;
+}
+
+/* Title spacing on calendar page */
+body[data-page="calendario"] .dashboard-header{ padding-bottom: 8px; }
