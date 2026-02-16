@@ -252,53 +252,233 @@ body {
   z-index: 5;
   min-width: 56px;
 }
+/* ===== Patch (non rompe il resto) ===== */
 
-/* =========================
-   Filtri (Tipo / Anno) affiancati
-   ========================= */
-.filter-bar{
-  padding: 16px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: nowrap;          /* niente colonna */
-  align-items: center;
-}
-.filter-bar .ios-select{
-  min-width: 0;               /* permette di restringere senza andare a capo */
-  flex: 1 1 0;
-}
-.filter-bar .ios-select:first-child{
-  flex: 1.4 1 0;              /* Tipo un po' più largo */
+/* 1) Il toggle "Solo Pianificato" può venire tagliato se overflow:hidden */
+.ios-input-group{ overflow: visible; }
+
+/* 2) Griglia calendario sempre visibile */
+.calendar-table{ border-collapse: collapse; }
+.calendar-table th, .calendar-table td{ border: 0.5px solid rgba(0,0,0,0.10) !important; }
+
+/* 3) Classi calendario coerenti con app.js */
+.bg-weekend{ background-color:#D1D1D6 !important; }
+.bg-festivo{ background-color: var(--red) !important; color:#fff !important; font-weight:800; }
+.bg-ferie-az{ background-color: var(--orange) !important; color:#fff !important; font-weight:800; }
+.bg-ferie{ background-color: var(--green) !important; color:#fff !important; font-weight:800; }
+.bg-rol{ background-color: #FFD60A !important; color:#000 !important; font-weight:800; }
+.bg-conto{ background-color: #34C759 !important; color:#fff !important; font-weight:800; }
+.bg-malattia{ background-color: #5D4037 !important; color:#fff !important; font-weight:800; }
+.bg-avis{ background-color: var(--blue) !important; color:#fff !important; font-weight:800; }
+
+/* 4) Pianificato: bordo tratteggiato */
+.is-pian{ outline: 2px dashed rgba(0,0,0,0.55); outline-offset: -3px; }
+
+
+/* =========================================================
+   DARK GLASS + LIQUID TAB BAR (v13)
+   - Always shows Liquid Glass tab bar
+   - Dark mode when system is dark
+   ========================================================= */
+
+/* Give more room for the floating tab bar */
+body{
+  padding-bottom: calc(140px + env(safe-area-inset-bottom));
 }
 
-/* Se lo schermo è davvero stretto, riduciamo padding e font ma restiamo affiancati */
-@media (max-width: 360px){
-  .filter-bar{ padding: 12px; gap: 8px; }
-  .filter-bar .ios-select{ font-size: 13px; padding: 7px 10px; }
-}
-/* =========================
-   FIX TAB BAR OVERFLOW
-   ========================= */
-
+/* Liquid glass bar */
 .tab-bar.tab-liquid{
+  position: fixed;
   left: 10px;
-  right: 10px;          /* meno largo */
-  max-width: 500px;     /* limite massimo */
-  margin: 0 auto;       /* centrato */
+  right: 10px;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  max-width: 520px;
+  margin: 0 auto;
+
+  height: 78px;
+  padding: 10px 12px;
+  border-radius: 26px;
+
+  background: rgba(255,255,255,0.14);
+  backdrop-filter: blur(22px) saturate(1.6);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+
+  border: 1px solid rgba(255,255,255,0.22);
+  box-shadow:
+    0 18px 40px rgba(0,0,0,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.28);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
   box-sizing: border-box;
-  overflow: hidden;     /* evita uscita laterale */
+  overflow: hidden; /* avoid lateral overflow */
+  z-index: 100;
 }
 
-/* Assicuriamoci che le tab non escano */
+/* Colored liquid blobs behind */
+.tab-bar.tab-liquid::before{
+  content:"";
+  position:absolute;
+  inset:-18px;
+  border-radius: 34px;
+  pointer-events:none;
+  filter: blur(18px);
+  opacity: 0.85;
+  background:
+    radial-gradient(110px 70px at 18% 40%, rgba(235,16,148,0.55), transparent 60%),
+    radial-gradient(120px 80px at 82% 55%, rgba(56,10,225,0.55), transparent 60%),
+    radial-gradient(120px 80px at 60% 12%, rgba(214,35,80,0.45), transparent 60%);
+}
+
+/* Glass highlight */
+.tab-bar.tab-liquid::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius: 26px;
+  pointer-events:none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.02) 55%, rgba(0,0,0,0.06));
+  mix-blend-mode: overlay;
+}
+
+/* Sliding indicator */
+.tab-bar.tab-liquid .liquid-indicator{
+  position:absolute;
+  top: 50%;
+  left: 0;
+  height: 54px;
+  width: 25%;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.20);
+  border: 1px solid rgba(255,255,255,0.28);
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.35);
+  transform: translateY(-50%) translateX(0);
+  transition: transform 0.45s cubic-bezier(.34,1.56,.64,1), width 0.45s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;
+  z-index: 1;
+}
+
 .tab-bar.tab-liquid .tab-item{
-  min-width: 0;
+  position: relative;
   flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  border-radius: 18px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-decoration: none;
+  z-index: 2;
+
+  font-size: 28px; /* icon size */
+  color: rgba(255,255,255,0.80);
+
+  transition: transform .15s ease, color .15s ease;
 }
 
-/* Se ancora troppo larga su schermi piccoli */
+.tab-bar.tab-liquid .tab-item span{
+  font-size: 13px;
+  font-weight: 650;
+  margin-top: 6px;
+  color: rgba(255,255,255,0.78);
+}
+
+.tab-bar.tab-liquid .tab-item.active{
+  color: rgba(255,255,255,0.95);
+  transform: translateY(-1px);
+}
+
+.tab-bar.tab-liquid .tab-item:active{
+  transform: scale(0.92);
+}
+
+/* Tight screens */
 @media (max-width: 390px){
   .tab-bar.tab-liquid{
     left: 6px;
     right: 6px;
+    height: 74px;
+  }
+  .tab-bar.tab-liquid .tab-item{
+    font-size: 26px;
+  }
+  .tab-bar.tab-liquid .tab-item span{
+    font-size: 12px;
+  }
+}
+
+/* System dark mode */
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg: #0B0B0F;
+    --card-bg: rgba(255,255,255,0.06);
+  }
+
+  body{
+    color: rgba(235,235,245,0.92);
+    background: var(--bg);
+  }
+
+  .ios-navbar{
+    background: rgba(18,18,20,0.70);
+    border-bottom: 0.5px solid rgba(255,255,255,0.10);
+  }
+
+  .ios-card{
+    background: rgba(255,255,255,0.06);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+
+  .ios-input-group{
+    background: rgba(255,255,255,0.06);
+    border: 0.5px solid rgba(255,255,255,0.12);
+  }
+
+  .ios-input-row{
+    border-bottom: 0.5px solid rgba(255,255,255,0.10);
+  }
+
+  .ios-input-row label{
+    color: rgba(235,235,245,0.92);
+  }
+
+  .ios-input-row input,
+  .ios-input-row select{
+    color: rgba(235,235,245,0.70);
+  }
+
+  .ios-card-btn{
+    background: rgba(255,255,255,0.06);
+    color: rgba(235,235,245,0.92);
+  }
+
+  .modal-nav{
+    background: rgba(18,18,20,0.92);
+    border-bottom: 0.5px solid rgba(255,255,255,0.10);
+  }
+
+  .ios-page-sheet{
+    background: rgba(18,18,20,0.92);
+  }
+
+  .tab-bar.tab-liquid{
+    background: rgba(20,20,22,0.55);
+    border: 1px solid rgba(255,255,255,0.14);
+    box-shadow:
+      0 18px 40px rgba(0,0,0,0.55),
+      inset 0 1px 0 rgba(255,255,255,0.16);
+  }
+
+  .tab-bar.tab-liquid .liquid-indicator{
+    background: rgba(255,255,255,0.10);
+    border-color: rgba(255,255,255,0.16);
   }
 }
