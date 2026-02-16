@@ -482,3 +482,70 @@ body{
     border-color: rgba(255,255,255,0.16);
   }
 }
+
+/* =========================
+   PATCH v14
+   - tab bar: a bit narrower (no overflow)
+   - calendario: dark mode styles
+   ========================= */
+
+/* Narrower Liquid Glass tab bar to prevent side overflow */
+.tab-bar.tab-liquid{
+  left: 14px;
+  right: 14px;
+  max-width: 480px;
+  padding: 10px 10px;
+}
+
+@media (max-width: 390px){
+  .tab-bar.tab-liquid{
+    left: 10px;
+    right: 10px;
+    max-width: none;
+  }
+  .tab-bar.tab-liquid .tab-item{
+    font-size: 26px;
+  }
+  .tab-bar.tab-liquid .tab-item span{
+    font-size: 12px;
+  }
+}
+
+/* Dark mode calendar (wrapper + grid) */
+@media (prefers-color-scheme: dark){
+  .calendar-wrapper{
+    background: rgba(18,18,20,0.92);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  }
+
+  .calendar-table{
+    color: rgba(235,235,245,0.92);
+  }
+
+  .calendar-table th{
+    background: rgba(255,255,255,0.06);
+    color: rgba(235,235,245,0.92);
+  }
+
+  .calendar-table td,
+  .calendar-table th{
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .calendar-table td:first-child{
+    background: rgba(255,255,255,0.06);
+    color: rgba(235,235,245,0.92);
+  }
+
+  /* Weekend slightly darker (if not overridden by event colors) */
+  .bg-weekend{
+    background-color: rgba(255,255,255,0.10) !important;
+  }
+
+  /* Empty/invalid days */
+  .calendar-table td.bg-empty,
+  .calendar-table td:empty{
+    background: rgba(255,255,255,0.03);
+  }
+}
