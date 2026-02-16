@@ -1,59 +1,39 @@
 <!DOCTYPE html>
+
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>iWork - Calendario</title>
-    <link rel="stylesheet" href="style.css?v=17">
-    <link rel="manifest" href="manifest.json?v=17">
-    <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>iWork - Calendario Orizzontale</title>
+<link href="style.css?v=17" rel="stylesheet"/>
 </head>
 <body data-page="calendario">
+<header class="ios-navbar">
+<div class="nav-content"><span class="nav-brand">iWork</span></div>
+</header>
 
-    <header class="ios-navbar">
-        <div class="nav-content">
-            <span class="nav-brand">Calendario</span>
-        </div>
-    </header>
+<main class="main-content">
+<header class="dashboard-header">
+<p class="date-subtitle" id="current-date"></p>
+<h1 class="large-title" id="calendar-title">Calendario</h1>
+</header>
 
-    <main class="main-content">
-        <header class="dashboard-header">
-            <p class="date-subtitle">Pianificazione Annuale</p>
-            <h1 class="large-title">Presenze</h1>
-        </header>
-
-        <div class="calendar-wrapper">
-            <table class="grid-table">
-                <thead>
-                    <tr id="calendarHeader">
-                        </tr>
-                </thead>
-                <tbody id="calendarBody">
-                    </tbody>
-            </table>
-        </div>
-
-        <div class="legend-container" style="padding: 16px; display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; opacity: 0.9;">
-            <div class="legend-item"><i class="bg-festivo" style="display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px;"></i> Festivo</div>
-            <div class="legend-item"><i class="bg-ferie" style="display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px;"></i> Ferie</div>
-            <div class="legend-item"><i class="bg-ferie-az" style="display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px;"></i> Chiusura</div>
-            <div class="legend-item"><i class="bg-rol" style="display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px;"></i> ROL</div>
-            <div class="legend-item"><i class="bg-avis" style="display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px;"></i> AVIS</div>
-            <div class="legend-item" style="border: 1px dashed rgba(255,255,255,0.5); padding: 0 4px; border-radius: 3px;">Pianificato</div>
-        </div>
-    </main>
-
-    <nav class="tab-bar tab-liquid">
-        <a href="index.html" class="tab-item">🏠<span>Home</span></a>
-        <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
-        <a href="malattia.html" class="tab-item">🤒<span>Malattia</span></a>
-        <a href="calendario.html" class="tab-item active">🗓️<span>Calendario</span></a>
-        
-        <div class="liquid-indicator"></div>
-    </nav>
-
-    <script src="app.js?v=17"></script>
+<div class="calendar-wrapper">
+<table class="calendar-table">
+<thead>
+<tr id="calendarHeader"></tr>
+</thead>
+<tbody id="calendarBody"></tbody>
+</table>
+</div>
+</main>
+<nav class="tab-bar tab-liquid">
+        <div class="liquid-indicator" aria-hidden="true"></div>
+<a class="tab-item" href="index.html">🏠<span>Home</span></a>
+<a class="tab-item" href="ferie.html">📅<span>Ferie</span></a>
+<a class="tab-item" href="malattia.html">🤒<span>Mal</span></a>
+<a class="tab-item active" href="calendario.html">🗓️<span>Cal</span></a>
+</nav>
+<script src="app.js?v=17"></script>
 </body>
 </html>

@@ -1,98 +1,60 @@
-/* =========================================================
-   iWork Service Worker - v17
-   ========================================================= */
-
+// iWork Service Worker (v17) - GitHub Pages friendly
 const CACHE_NAME = 'iwork-v17';
 
-// Elenco degli asset da memorizzare nella cache durante l'installazione
+// Cache solo asset principali (percorsi RELATIVI)
 const ASSETS = [
   './',
-  './index.html?v=17',
-  './ferie.html?v=17',
-  './malattia.html?v=17',
-  './calendario.html?v=17',
-  './style.css?v=17',
-  './app.js?v=17',
-  './manifest.json?v=17',
+  './index.html',
+  './ferie.html',
+  './malattia.html',
+  './calendario.html',
+  './style.css',
+  './app.js',
+  './manifest.json',
   './icon-192.png',
-  './icon-512.png',
-  './icon-180.png'
+  './icon-512.png'
 ];
 
-// Installazione: crea la cache e aggiunge gli asset
 self.addEventListener('install', (event) => {
-  self.skipWaiting(); // Forza l'attivazione immediata del nuovo SW
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('SW: Cache aperta e asset in fase di aggiunta');
-      return cache.addAll(ASSETS);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
 
-// Attivazione: pulizia delle vecchie cache
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
       const keys = await caches.keys();
-      await Promise.all(
-        keys.map((k) => {
-          if (k !== CACHE_NAME) {
-            console.log('SW: Rimozione vecchia cache:', k);
-            return caches.delete(k);
-          }
-        })
-      );
+      await Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : Promise.resolve())));
       await self.clients.claim();
     })()
   );
 });
 
-// Gestione delle richieste (Fetch)
+// HTML: network-first (così si aggiorna subito)
+// Altri asset: cache-first
 self.addEventListener('fetch', (event) => {
   const req = event.request;
+  if (req.method !== 'GET') return;
+
   const url = new URL(req.url);
-
-  // Gestisci solo richieste dello stesso origin (evita problemi con script esterni)
-  if (url.origin !== self.location.origin) return;
-
-  const accept = req.headers.get('accept') || '';
-  const isHTML = accept.includes('text/html') || url.pathname.endsWith('.html') || url.pathname.endsWith('/');
+  const isHTML = req.headers.get('accept')?.includes('text/html') || url.pathname.endsWith('.html') || url.pathname.endsWith('/');
 
   if (isHTML) {
-    // STRATEGIA: Network-First per HTML
-    // Proviamo a scaricare la versione più recente, se fallisce (offline) usiamo la cache
     event.respondWith(
-      (async () => {
-        try {
-          const fresh = await fetch(req);
-          const cache = await caches.open(CACHE_NAME);
-          cache.put(req, fresh.clone());
-          return fresh;
-        } catch (e) {
-          const cached = await caches.match(req, { ignoreSearch: true });
-          return cached || caches.match('./index.html?v=17');
-        }
-      })()
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(req, copy)).catch(() => {});
+          return res;
+        })
+        .catch(() => caches.match(req).then((r) => r || caches.match('./index.html')))
     );
     return;
   }
 
-  // STRATEGIA: Cache-First per asset statici (CSS, JS, Immagini)
   event.respondWith(
-    (async () => {
-      const cached = await caches.match(req, { ignoreSearch: true });
-      if (cached) return cached;
-
-      try {
-        const fresh = await fetch(req);
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(req, fresh.clone());
-        return fresh;
-      } catch (e) {
-        // Se siamo qui, la risorsa non è in cache e non c'è rete
-        return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
-      }
-    })()
+    caches.match(req).then((cached) => cached || fetch(req))
   );
 });
