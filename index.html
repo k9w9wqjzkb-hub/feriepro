@@ -6,13 +6,19 @@
     <title>iWork - Dashboard</title>
     <link rel="stylesheet" href="style.css?v=17">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
+
+     <!-- iOS PWA -->
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
+
 <body data-page="index">
     <header class="ios-navbar">
-        <div class="nav-content"><span class="nav-brand">iWork</span></div>
+        <div class="nav-content">
+	<span class="nav-brand">Ferie</span>	
+	</div>
     </header>
 
     <main class="main-content">
@@ -27,16 +33,19 @@
                 <span class="value" id="val-ferie">--</span>
                 <span class="subvalue" id="val-ferie-pian">Prev: --</span>
             </div>
+
             <div class="ios-card" style="border-left: 4px solid var(--orange);">
                 <span class="card-label" style="color:var(--orange)">Permessi</span>
                 <span class="value" id="val-rol">--</span>
                 <span class="subvalue" id="val-rol-pian">Prev: --</span>
             </div>
+
             <div class="ios-card" style="border-left: 4px solid var(--green);">
                 <span class="card-label" style="color:var(--green)">Perm.B.Ore</span>
                 <span class="value" id="val-conto">--</span>
                 <span class="subvalue" id="val-conto-pian">Prev: --</span>
             </div>
+
             <div class="ios-card" style="border-left: 4px solid var(--red);">
                 <span class="card-label" style="color:var(--red)">Malattia</span>
                 <span class="value" id="val-malattia">--</span>
@@ -140,7 +149,7 @@
         <a href="malattia.html" class="tab-item">🤒<span>Malattia</span></a>
         <a href="calendario.html" class="tab-item">🗓️<span>Calendario</span></a>
     </nav>
-    <script src="app.js?v=17"></script>
+
     <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -149,6 +158,6 @@
         .catch(err => console.log('Errore SW:', err));
     });
   }
-</script>
+<script src="app.js?v=17"></script>
 </body>
 </html>

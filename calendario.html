@@ -1,39 +1,43 @@
 <!DOCTYPE html>
-
 <html lang="it">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
-<title>iWork - Calendario Orizzontale</title>
-<link href="style.css?v=17" rel="stylesheet"/>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+    <title>iWork - Calendario Orizzontale</title>
+    <link rel="stylesheet" href="style.css?v=17">
+    <link rel="manifest" href="manifest.json">
 </head>
+
 <body data-page="calendario">
-<header class="ios-navbar">
-<div class="nav-content"><span class="nav-brand">iWork</span></div>
-</header>
+    <header class="ios-navbar">
+	<div class="nav-content">
+	<span class="nav-brand">iWork</span>
+	</div>
+    </header>
 
-<main class="main-content">
-<header class="dashboard-header">
-<p class="date-subtitle" id="current-date"></p>
-<h1 class="large-title" id="calendar-title">Calendario</h1>
-</header>
+    <main class="main-content">
+	<header class="dashboard-header">
+	    <p class="date-subtitle" id="current-date"></p>
+	    <h1 class="large-title" id="calendar-title">Calendario</h1>
+	</header>
 
-<div class="calendar-wrapper">
-<table class="calendar-table">
-<thead>
-<tr id="calendarHeader"></tr>
-</thead>
-<tbody id="calendarBody"></tbody>
-</table>
-</div>
-</main>
-<nav class="tab-bar tab-liquid">
+	<div class="calendar-wrapper">
+	<table class="calendar-table">
+	<thead>
+	<tr id="calendarHeader"></tr>
+	</thead>
+	<tbody id="calendarBody"></tbody>
+	</table>
+	</div>
+    </main>
+
+    <nav class="tab-bar tab-liquid">
         <div class="liquid-indicator" aria-hidden="true"></div>
-<a class="tab-item" href="index.html">🏠<span>Home</span></a>
-<a class="tab-item" href="ferie.html">📅<span>Ferie</span></a>
-<a class="tab-item" href="malattia.html">🤒<span>Mal</span></a>
-<a class="tab-item active" href="calendario.html">🗓️<span>Cal</span></a>
-</nav>
+	    <a class="tab-item" href="index.html">🏠<span>Home</span></a>
+	    <a class="tab-item" href="ferie.html">📅<span>Ferie</span></a>
+	    <a class="tab-item" href="malattia.html">🤒<span>Malattia</span></a>
+	    <a class="tab-item active" href="calendario.html">🗓️<span>Calendario</span></a>
+    </nav>
 <script src="app.js?v=17"></script>
 </body>
 </html>
