@@ -715,8 +715,13 @@ function importBackup(e) {
    LIQUID TAB BAR INDICATOR
    ========================= */
 function initLiquidTabBar() {
-  const bar = document.querySelector('.tab-bar.tab-liquid');
-  if (!bar) return;
+  const indicator = document.querySelector('.liquid-indicator');
+  const activeItem = document.querySelector('.tab-item.active');
+  if (!indicator || !activeItem) return;
+
+  indicator.style.width = activeItem.offsetWidth + "px";
+  indicator.style.left = activeItem.offsetLeft + "px";
+}
 
   // assicurati che esista un solo indicatore
   let indicator = bar.querySelector('.liquid-indicator');
@@ -765,5 +770,4 @@ function initLiquidTabBar() {
       place();
     });
   });
-}
 
