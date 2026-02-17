@@ -709,3 +709,22 @@ function importBackup(e) {
   };
   r.readAsText(file);
 }
+
+
+function initLiquidTabBar() {
+  const tabBar = document.querySelector(".liquid-tabbar");
+  if (!tabBar) return;
+
+  const indicator = tabBar.querySelector(".liquid-indicator");
+  const active = tabBar.querySelector(".tab-item.active");
+
+  if (!indicator || !active) return;
+
+  const rect = active.getBoundingClientRect();
+  const parentRect = tabBar.getBoundingClientRect();
+
+  indicator.style.width = rect.width + "px";
+  indicator.style.transform = `translateX(${rect.left - parentRect.left}px)`;
+}
+
+document.addEventListener("DOMContentLoaded", initLiquidTabBar);

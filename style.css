@@ -754,3 +754,16 @@ body[data-page="calendario"] .dashboard-header{ padding-bottom: 8px; }
   font-weight: 800 !important;
   letter-spacing: -0.4px;
 }
+
+
+/* Sheet body black glass fix */
+.sheet-body {
+  background: var(--bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  .sheet-body {
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(20px);
+  }
+}
