@@ -60,7 +60,7 @@
             <span class="modal-title" style="font-weight:600;">Nuovo Record</span>
             <button onclick="saveData()" class="btn-link" style="font-weight:700;">Aggiungi</button>
         </div>
-        <div style="padding: 20px; background: var(--bg); height: 100%;">
+        <div style="padding: 20px;  height: 100%;">
             <div class="ios-input-group">
                 <div class="ios-input-row">
                     <label>Tipo</label>
@@ -102,7 +102,7 @@
             <button onclick="toggleSheet(false)" class="btn-link" style="font-weight:700;">Fatto</button>
         </div>
         <div style="padding:20px; overflow-y:auto; height:calc(100% - 60px);">
-            <div id="settings-panel" style="display:none; background:var(--bg); padding:15px; border-radius:14px; margin-bottom:20px; border: 1px solid #DDD;">
+            <div id="settings-panel" style="display:none; background:#F2F2F7; padding:15px; border-radius:14px; margin-bottom:20px; border: 1px solid #DDD;">
                 <h3 style="margin-top:0; font-size:16px;">Configurazione Residui (Ore)</h3>
                 <div id="settings-inputs"></div>
                 <button onclick="saveSettings()" class="ios-btn-blue" style="margin-top:10px; padding:12px;">Salva e Aggiorna</button>
@@ -133,15 +133,13 @@
         </div>
     </div>
 
-    <nav class="tab-bar">
-  <div class="liquid-indicator"></div>
-
-  <a href="index.html" class="tab-item active">🏠<span>Home</span></a>
-  <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
-  <a href="malattia.html" class="tab-item">🤒<span>Malattia</span></a>
-  <a href="calendario.html" class="tab-item">🗓️<span>Calendario</span></a>
-</nav>
-
+    <nav class="tab-bar tab-liquid">
+        <div class="liquid-indicator" aria-hidden="true"></div>
+        <a href="index.html" class="tab-item active">🏠<span>Home</span></a>
+        <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
+        <a href="malattia.html" class="tab-item">🤒<span>Malattia</span></a>
+        <a href="calendario.html" class="tab-item">🗓️<span>Calendario</span></a>
+    </nav>
     <script src="app.js?v=17"></script>
     <script>
   if ('serviceWorker' in navigator) {

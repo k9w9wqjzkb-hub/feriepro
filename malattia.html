@@ -6,7 +6,7 @@
     <title>iWork - Malattia</title>
 
     <link rel="stylesheet" href="style.css?v=17">
-    <link rel="manifest" href="manifest.json?v=16">
+    <link rel="manifest" href="manifest.json">
 
     <!-- iOS PWA -->
     <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
@@ -45,15 +45,13 @@
         </div>
     </main>
 
-    <nav class="tab-bar">
-  <div class="liquid-indicator"></div>
-
-  <a href="index.html" class="tab-item">🏠<span>Home</span></a>
-  <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
-  <a href="malattia.html" class="tab-item active">🤒<span>Malattia</span></a>
-  <a href="calendario.html" class="tab-item">🗓️<span>Calendario</span></a>
-</nav>
-
+    <nav class="tab-bar tab-liquid">
+        <div class="liquid-indicator" aria-hidden="true"></div>
+<a href="index.html" class="tab-item">🏠<span>Home</span></a>
+        <a href="ferie.html" class="tab-item">📅<span>Ferie</span></a>
+        <a href="malattia.html" class="tab-item active">🤒<span>Malattia</span></a>
+        <a href="calendario.html" class="tab-item">🗓️<span>Calendario</span></a>
+    </nav>
 
     <script src="app.js?v=17"></script>
 </body>

@@ -711,63 +711,20 @@ function importBackup(e) {
 }
 
 
-/* =========================
-   LIQUID TAB BAR INDICATOR
-   ========================= */
 function initLiquidTabBar() {
-  const indicator = document.querySelector('.liquid-indicator');
-  const activeItem = document.querySelector('.tab-item.active');
-  if (!indicator || !activeItem) return;
+  const tabBar = document.querySelector(".liquid-tabbar");
+  if (!tabBar) return;
 
-  indicator.style.width = activeItem.offsetWidth + "px";
-  indicator.style.left = activeItem.offsetLeft + "px";
+  const indicator = tabBar.querySelector(".liquid-indicator");
+  const active = tabBar.querySelector(".tab-item.active");
+
+  if (!indicator || !active) return;
+
+  const rect = active.getBoundingClientRect();
+  const parentRect = tabBar.getBoundingClientRect();
+
+  indicator.style.width = rect.width + "px";
+  indicator.style.transform = `translateX(${rect.left - parentRect.left}px)`;
 }
 
-  // assicurati che esista un solo indicatore
-  let indicator = bar.querySelector('.liquid-indicator');
-  if (!indicator) {
-    indicator = document.createElement('div');
-    indicator.className = 'liquid-indicator';
-    indicator.setAttribute('aria-hidden', 'true');
-    bar.prepend(indicator);
-  }
-  // rimuovi eventuali duplicati
-  const all = bar.querySelectorAll('.liquid-indicator');
-  if (all.length > 1) {
-    all.forEach((el, i) => { if (i > 0) el.remove(); });
-    indicator = bar.querySelector('.liquid-indicator');
-  }
-
-  const items = Array.from(bar.querySelectorAll('.tab-item'));
-  if (!items.length) return;
-
-  // se l'HTML non ha "active", proviamo a settarlo in base all'URL
-  const path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-  items.forEach(a => {
-    const href = (a.getAttribute('href') || '').toLowerCase();
-    if (href && href === path) a.classList.add('active');
-    else if (href) a.classList.remove('active');
-  });
-
-  const place = () => {
-    const active = bar.querySelector('.tab-item.active') || items[0];
-    const barRect = bar.getBoundingClientRect();
-    const aRect = active.getBoundingClientRect();
-    const w = Math.max(56, aRect.width - 12);
-    const x = (aRect.left - barRect.left) + (aRect.width - w) / 2;
-    indicator.style.width = w + 'px';
-    indicator.style.transform = `translateX(${x}px)`;
-  };
-
-  place();
-  window.addEventListener('resize', place);
-
-  // aggiorna anche al click
-  items.forEach(a => {
-    a.addEventListener('click', () => {
-      items.forEach(x => x.classList.remove('active'));
-      a.classList.add('active');
-      place();
-    });
-  });
-
+document.addEventListener("DOMContentLoaded", initLiquidTabBar);
