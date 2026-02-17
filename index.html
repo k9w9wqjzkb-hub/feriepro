@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>iWork - Dashboard</title>
-    <link rel="stylesheet" href="style.css?v=17">
+   <link rel="stylesheet" href="style.css?v=17">
     <link rel="manifest" href="manifest.json">
-
-     <!-- iOS PWA -->
-    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
@@ -149,7 +146,7 @@
         <a href="malattia.html" class="tab-item">🤒<span>Malattia</span></a>
         <a href="calendario.html" class="tab-item">🗓️<span>Calendario</span></a>
     </nav>
-
+    <script src="app.js?v=17"></script>
     <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -158,6 +155,6 @@
         .catch(err => console.log('Errore SW:', err));
     });
   }
-<script src="app.js?v=17"></script>
+</script>
 </body>
 </html>
