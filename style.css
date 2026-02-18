@@ -901,3 +901,11 @@ body[data-page="calendario"] .dashboard-header{ padding-bottom: 8px; }
 }
 #settings-panel h3 { color: #fff; }
 
+/* Tab bar altezza fissa */
+.tab-bar{
+  height: 76px;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+body{
+  padding-bottom: calc(76px + env(safe-area-inset-bottom) + 18px);
+}
