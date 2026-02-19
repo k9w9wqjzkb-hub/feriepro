@@ -929,3 +929,42 @@ html, body {
 .main-content{
   padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
 }
+/* =========================
+   FIX MODALE EDIT (dark)
+   ========================= */
+
+.ios-page-sheet {
+  color: #fff; /* testo sempre visibile */
+}
+
+.ios-page-sheet .modal-nav {
+  background: rgba(20,20,24,0.95);
+  color: #fff;
+}
+
+.ios-page-sheet .modal-title {
+  color: #fff;
+}
+
+.ios-page-sheet .ios-input-group {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.ios-page-sheet .ios-input-row {
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+}
+
+.ios-page-sheet .ios-input-row label {
+  color: rgba(255,255,255,0.85);
+}
+
+.ios-page-sheet .ios-input-row input,
+.ios-page-sheet .ios-input-row select {
+  background: rgba(255,255,255,0.10);
+  color: #fff;
+}
+
+.ios-page-sheet .ios-input-row input::placeholder {
+  color: rgba(255,255,255,0.45);
+}
