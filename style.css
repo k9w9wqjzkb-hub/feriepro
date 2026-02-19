@@ -474,3 +474,66 @@ body[data-page="calendario"] .is-pian{
   font-size: 16px;
   cursor:pointer;
 }
+
+/* =========================================================
+   v27 - FIX MODALE MODIFICA (✏️)
+   Se la modale edit viene generata via JS con markup diverso,
+   forziamo testi/label visibili anche in dark glass.
+   Non impatta le modali di index (scope su #edit-modal).
+   ========================================================= */
+
+#edit-modal,
+#edit-modal *{
+  color: var(--text);
+}
+
+#edit-modal .sheet-body,
+#edit-modal .edit-body{
+  background: transparent;
+}
+
+#edit-modal .ios-input-group,
+#edit-modal .edit-group{
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
+  overflow: visible;
+}
+
+#edit-modal .ios-input-row,
+#edit-modal .edit-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+}
+
+#edit-modal .ios-input-row:last-child,
+#edit-modal .edit-row:last-child{
+  border-bottom: none;
+}
+
+#edit-modal label{
+  font-size: 17px;
+  color: var(--text);
+}
+
+#edit-modal input,
+#edit-modal select,
+#edit-modal textarea{
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-size: 16px;
+}
+
+#edit-modal input::placeholder,
+#edit-modal textarea::placeholder{
+  color: rgba(255,255,255,0.35);
+}
+
+#edit-modal .checkbox-container{ color: var(--text); }
