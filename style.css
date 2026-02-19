@@ -900,4 +900,10 @@ body[data-page="calendario"] .dashboard-header{ padding-bottom: 8px; }
   color: #fff;
 }
 #settings-panel h3 { color: #fff; }
+html, body {
+    height: 100%;
+}
 
+.main-content {
+    padding-bottom: 110px; /* spazio fisso per tab-bar */
+}
