@@ -907,3 +907,25 @@ html, body {
 .main-content {
     padding-bottom: 110px; /* spazio fisso per tab-bar */
 }
+/* ===== FIX TAB-BAR: altezza e posizione identiche in tutte le pagine ===== */
+.tab-bar{
+  position: fixed !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+
+  bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+
+  width: min(94%, 560px) !important;
+  box-sizing: border-box !important;
+
+  /* altezza stabile */
+  height: 78px !important;
+
+  /* evita “sfarfallii”/shift */
+  will-change: transform !important;
+}
+
+/* spazio contenuto stabile (non fa “saltare” la pagina ferie) */
+.main-content{
+  padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
+}
