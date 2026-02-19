@@ -537,3 +537,56 @@ body[data-page="calendario"] .is-pian{
 }
 
 #edit-modal .checkbox-container{ color: var(--text); }
+
+/* =========================================================
+   FIX: MODALE "MODIFICA RECORD" (ferie.html)
+   In alcune pagine la modale viene generata via JS (#edit-modal)
+   e può risultare "tutta nera" (input/testi invisibili).
+   Queste regole rendono SEMPRE leggibili label, input e select.
+   ========================================================= */
+
+#edit-modal,
+#edit-modal.ios-page-sheet{
+  color: rgba(235,235,245,0.92);
+}
+
+#edit-modal .modal-nav{
+  background: rgba(18,18,20,0.90) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.10) !important;
+}
+
+#edit-modal .btn-link{ color: var(--blue) !important; }
+
+/* Wrapper contenuto (qualsiasi) */
+#edit-modal .sheet-body,
+#edit-modal .modal-body,
+#edit-modal .content{
+  color: inherit;
+}
+
+#edit-modal label{ color: rgba(235,235,245,0.86) !important; }
+
+#edit-modal input,
+#edit-modal select,
+#edit-modal textarea{
+  color: rgba(235,235,245,0.92) !important;
+  background: rgba(255,255,255,0.08) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+#edit-modal input::placeholder,
+#edit-modal textarea::placeholder{
+  color: rgba(235,235,245,0.45) !important;
+}
+
+/* Se la modale usa i componenti iOS */
+#edit-modal .ios-input-group{
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+}
+#edit-modal .ios-input-row{
+  border-bottom: 1px solid rgba(255,255,255,0.10) !important;
+}
