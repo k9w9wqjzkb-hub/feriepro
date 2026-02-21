@@ -901,3 +901,12 @@ body[data-page="calendario"] .dashboard-header{ padding-bottom: 8px; }
 }
 #settings-panel h3 { color: #fff; }
 
+/* ===== FIX FERIE PAGE LAYOUT SHIFT ===== */
+
+body[data-page="ferie"] {
+  min-height: 100vh;
+}
+
+body[data-page="ferie"] .main-content {
+  padding-bottom: calc(140px + env(safe-area-inset-bottom));
+}
